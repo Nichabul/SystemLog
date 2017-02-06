@@ -1,0 +1,96 @@
+﻿@using System.Collections.Generic
+@using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Http.Authentication
+@model IEnumerable<SystemLog.Models.Details>
+@inject SignInManager<ApplicationUser> SignInManager
+
+@{
+    ViewData["Title"] = "ดูรายการการติดตามสถานะการดำเนินงาน";
+    var Helper = ViewBag.Helper as SystemLog.Helper.Utility;
+    //SystemLog.Helper.Utility Helper = new SystemLog.Helper.Utility();
+}
+
+<h2 style="margin-top: 40px; text-align:center;">@ViewData["Title"]</h2>
+<form asp-controller="Detail" asp-action="Reportdetail" id="addreport" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="form-horizontal">
+    @*<div asp-validation-summary="All" class="text-danger"></div>*@
+    วันที่สร้างรายการ :  @Helper.getDateTHAndTimeShortMonth(ViewBag.date)
+
+    <div>
+        <div style="text-align:right;">
+            @*<button type="button" class="btn btn-primary" id="PrintReport">ปริ้นรายการ</button>*@
+            <button type="button" class="btn btn-success" id="ExportExcel">ส่งออก Excel</button>
+        </div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th style="text-align:center;">หน่วยงาน/ลูกค้า และอื่นๆ</th>
+                    <th style="text-align:center;">งาน</th>
+                    <th style="text-align:center;">วันที่คาดว่าจะเสร็จ</th>
+                    <th style="text-align:center;">สถานะ</th>
+                    <th style="text-align:center;">ปัญหา</th>
+                    <th style="text-align:center;">แนวทางแก้ไข</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                       
+                        foreach (var Getreport in Model)
+                        {
+                            <tr>
+                                <td>
+                                    @Getreport.DetailsName
+                                </td>
+                                <td>
+                                    @Getreport.DetailWork
+                                </td>
+                                <td style="text-align:center">
+                                    @Helper.getDateTHAndTimeShortMonth(Getreport.DetailsDueDate)
+                                </td>
+                                @{
+                                    if (Getreport.DetailsStatus == 100)
+                                    {
+                                        <td style="text-align:center">
+                                           สำเร็จ
+                                        </td>
+
+                                    }
+                                    else
+                                    {
+                                        <td style="text-align:center">
+                                            @Getreport.DetailsStatus%
+                                        </td>
+
+                                    }
+                                }
+                               
+                                <td>
+                                   @Getreport.DetailsNoteProblem
+                                </td>
+                                <td>
+                                   @Getreport.DetailsNoteSolve
+                                </td>
+                            </tr>
+                        }
+                    }
+
+            </tbody>
+        </table>
+    </div>
+</form>
+    <input type="hidden" name="UserId" id="UserId" value="@ViewBag.UserId">
+    <input type="hidden" name="DetailsCreatedate" id="Date" value="@ViewBag.date" />
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            $("#ExportExcel").click(function () {
+                var UserId = $("#UserId").val();
+                var Date = $("#Date").val();
+                window.location.href = "/Detail/Export?UserId=" + UserId + "&Date=" + Date;
+
+            });
+
+        });
+    </script>
+}
+
+

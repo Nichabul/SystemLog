@@ -1,0 +1,76 @@
+﻿@model RegisterViewModel
+@{
+    ViewData["Title"] = "ลงทะเบียนเข้าใช้งาน";
+}
+
+<h2>@ViewData["Title"].</h2>
+
+<form asp-controller="Account" asp-action="Register" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="form-horizontal">
+    <h4>สร้างบัญชีผู้ใช้งานใหม่</h4>
+    <hr />
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <div class="form-group">
+        <label asp-for="Username" class="col-md-2 control-label">ชื่อผู้ใช้</label>
+        <div class="col-md-10">
+            <input asp-for="Username" class="form-control" />
+            <span asp-validation-for="Username" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label asp-for="Password" class="col-md-2 control-label">รหัสผ่าน</label>
+        <div class="col-md-10">
+            <input asp-for="Password" class="form-control" />
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label asp-for="ConfirmPassword" class="col-md-2 control-label">ยืนยันรหัสผ่านอีกครั้ง</label>
+        <div class="col-md-10">
+            <input asp-for="ConfirmPassword" class="form-control" />
+            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label asp-for="FirstName" class="col-md-2 control-label">ชื่อ</label>
+        <div class="col-md-4">
+            <input asp-for="FirstName" class="form-control" />
+            <span asp-validation-for="FirstName" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label asp-for="LastName" class="col-md-2 control-label">นามสกุล</label>
+        <div class="col-md-4">
+            <input asp-for="LastName" class="form-control" />
+            <span asp-validation-for="LastName" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-2 control-label">บริษัท</label>
+        <div class="col-md-10">
+            @Html.DropDownList("CompanyId", (IEnumerable<SelectListItem>)ViewBag.Company, new { @class = "form-control" })
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="col-md-2 control-label">แผนก</label>
+        <div class="col-md-10">
+            @Html.DropDownList("UserDepartmentsId", (IEnumerable<SelectListItem>)ViewBag.Department, new { @class = "form-control" })
+        </div>
+    </div>
+   
+    <div class="form-group">
+        <label asp-for="Email" class="col-md-2 control-label">อีเมล</label>
+        <div class="col-md-10">
+            <input asp-for="Email" class="form-control" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <button type="submit" class="btn btn-default">Register</button>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

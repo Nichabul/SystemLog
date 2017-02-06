@@ -1,0 +1,118 @@
+﻿@using System.Collections.Generic
+@using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Http.Authentication
+@model IEnumerable<SystemLog.Models.Details>
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+@{
+    var currentUser = await UserManager.FindByIdAsync(UserManager.GetUserId(User));
+}
+@{
+    ViewData["Title"] = "ค้นหารายการการติดตามสถานะการดำเนินการ";
+    var Helper = ViewBag.Helper as SystemLog.Helper.Utility;
+}
+
+<h2 style="margin-top: 40px; text-align:center;">@ViewData["Title"]</h2>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="well" style="padding:45px;">
+                <form asp-controller="Detail" asp-action="SearchReports"asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="form-horizontal">
+                <div style="text-align:center;">
+                    <label class="control-label col-md-2">วันที่เริ่มต้น</label>
+                    <div class="SearchDate col-md-3">
+                        <input data-format="dd/MM/yyyy" type="text" class="form-control" name="StartDate" id="StartDate" value="@ViewBag.StartDate"/>
+                    </div>
+                    <label class="control-label col-md-2">วันที่สิ้นสุด</label>
+                    <div class="SearchDate col-md-3">
+                        <input data-format="dd/MM/yyyy" type="text" class="form-control" name="EndDate" id="EndDate" value="@ViewBag.EndDate"/>
+                    </div>
+                    <button type="submit" class="btn btn-warning col-md-1" id="search">ค้นหา</button>
+                </div>
+                </form>
+            </div>
+            <input type="hidden" name="UserId" id="UserId" value="@ViewBag.UserId">
+
+            <div style="text-align:right;">
+                @*<button type="button" class="btn btn-primary">ปริ้นรายการ</button>*@
+                <button type="button" class="btn btn-success" id="Excelreport">ส่งออก Excel</button>
+            </div>
+            <div style="margin-bottom:10px;"></div>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th style="text-align:center;" rowspan="2">วันที่</th>
+                        <th style="text-align:center;" rowspan="2">หน่วยงาน/ลูกค้า และอื่นๆ</th>
+                        <th style="text-align:center;" colspan="3">รายละเอียด</th>
+                        <th style="text-align:center;" colspan="2">หมายเหตุ</th>
+                    </tr>
+                    <tr>
+                        <th style="text-align:center;">งาน</th>
+                        <th style="text-align:center;">วันที่คาดว่าจะเสร็จ</th>
+                        <th style="text-align:center;">สถานะ</th>
+                        <th style="text-align:center;">ปัญหา/ไม่เรียบร้อย และอื่นๆ</th>
+                        <th style="text-align:center;">แนวทางแก้ไข/ปรับปรุง</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        if (Model.Count() > 0)
+                        {
+                            foreach (var Searchreport in Model)
+                            {
+                                <tr>
+                                    <th>@Helper.getDateTHAndTimeShortMonth(Searchreport.DetailsCreatedate)</th>
+                                    <th>@Searchreport.DetailsName</th>
+                                    <th>@Searchreport.DetailWork</th>
+                                    <th>@Helper.getDateTHAndTimeShortMonth(Searchreport.DetailsDueDate)</th>
+                                    @{
+                                        if (Searchreport.DetailsStatus == 100)
+                                        {
+                                            <th>สำเร็จ</th>
+
+                                        }
+                                        else
+                                        {
+                                            <th>@Searchreport.DetailsStatus</th>
+
+                                        }
+                                    }
+                                    <th>@Searchreport.DetailsNoteProblem</th>
+                                    <th>@Searchreport.DetailsNoteSolve</th>
+                                </tr>
+                            }
+
+                       } else{
+                                <tr>
+                                     <th colspan="7" style="text-align:center;color:red;">***ไม่มีข้อมูลการติดตามสถานะการดำเนินงาน***</th>
+                                </tr>
+                      }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+   
+@section Scripts {
+
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+    <script>
+        $(document).ready(function () {
+            $('#StartDate').datepicker({
+                autoclose: true,
+                language: 'th'
+            });
+            $('#EndDate').datepicker({
+                autoclose: true,
+                language: 'th'
+            });
+
+            $("#Excelreport").click(function () {
+                var StartDate = $("#StartDate").val();
+                var EndDate = $("#EndDate").val();
+                var UserId = $("#UserId").val();
+                window.location.href = "/Detail/Exportreport?StartDate=" + StartDate + "&EndDate=" + EndDate + "&UserId" + UserId;
+            });
+        });
+    </script>
+
+}
