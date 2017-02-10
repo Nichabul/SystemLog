@@ -243,7 +243,7 @@ namespace SystemLog.Controllers
             return View("SearchReports", Searchreport);
 
         }
-
+        
         [Authorize]
         public async Task<FileStreamResult> Exportreport(DateTime StartDate, DateTime EndDate, string UserId)
         {
@@ -300,5 +300,120 @@ namespace SystemLog.Controllers
             var mimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
             return new FileStreamResult(new FileStream(newFilePath, FileMode.Open), mimeType);
         }
+
+        //Admin
+        [HttpGet]
+        public async Task<IActionResult> SearchReportsAdmin(DateTime? StartDate, DateTime? EndDate, String UserId)
+        {
+            var currentUser = await _userManager.FindByIdAsync(_userManager.GetUserId(User));
+
+            if (StartDate == null || StartDate == DateTime.MinValue)
+            {
+                StartDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+            }
+            if (EndDate == null || EndDate == DateTime.MinValue)
+            {
+                var DayInMonth = DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month);
+                EndDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DayInMonth);
+            }
+            ViewBag.Helper = Helper;
+            ViewBag.StartDate = StartDate;
+            ViewBag.EndDate = EndDate;
+            ViewBag.UserId = UserId;
+
+            ViewBag.Company = new SelectList(DB.Companys.ToList(), "CompanyId", "CompanyName");
+            var SearchReportAdmin = await DB.Details.Where(a => a.DetailsCreatedate >= StartDate && a.DetailsCreatedate <= EndDate
+                             && a.DetailsUsersId == UserId).ToListAsync();
+            return View("SearchReportsAdmin", SearchReportAdmin);
+        }
+        [HttpPost]
+        public async Task<IActionResult> SearchReportsAdmin(DateTime StartDate, DateTime EndDate, String UserId)
+        {
+            ViewBag.UserId = UserId;
+            ViewBag.Helper = Helper;
+            ViewBag.StartDate = StartDate;
+            ViewBag.EndDate = EndDate;
+            ViewBag.Company = new SelectList(DB.Companys.ToList(), "CompanyId", "CompanyName");
+
+           
+            var SearchReportAdmin = await DB.Details.Where(a=> a.DetailsCreatedate >= StartDate && a.DetailsCreatedate <= EndDate
+                                    && a.DetailsUsersId == UserId).ToListAsync();
+           
+
+            return View("SearchReportsAdmin", SearchReportAdmin);
+        }
+
+        [HttpGet]
+        public async  Task<IActionResult> EmployeeList (int CompanyId)
+        {
+            string Html = "";
+            var currentUser = await _userManager.FindByNameAsync(_userManager.GetUserId(User));
+            var Model = await DB.Users.Include(a => a.Departments).Where(b => b.Departments.DeptCompanyId == CompanyId).ToListAsync();
+
+            Html += "<select>";
+            Html += "<option value=''>---กรุณเลือก---</option>";
+            foreach (var User in Model)
+            {
+                Html += "<option value='" + User.Id + "'>" + User.FirstName+" " + User.LastName + "</option>";
+            }
+            Html += "</select>";
+            return Json(Html);
+        }
+
+        [Authorize]
+        public async Task<FileStreamResult> ExportreportAdmin(DateTime StartDate, DateTime EndDate, string UserId)
+        {
+            ViewBag.UserId = UserId;
+            var User = await DB.Users.Where(a => a.Id == UserId).FirstOrDefaultAsync();
+            var FullName = User.FirstName + " " + User.LastName;
+
+            var GetReports = await DB.Details.Where(a => a.DetailsCreatedate >= StartDate && a.DetailsCreatedate <= EndDate && a.DetailsUsersId == UserId).ToListAsync();
+
+            var templateFilePath = Path.Combine(_environment.WebRootPath.ToString(), "ReportTemplate/TemplateLogsystem.xlsx");
+            FileInfo templateFile = new FileInfo(templateFilePath);
+
+            var newFilePath = Path.Combine(_environment.WebRootPath.ToString(), "ReportTemplate/TempLogsystem.xlsx");
+            FileInfo newFile = new FileInfo(newFilePath);
+
+            using (ExcelPackage package = new ExcelPackage(newFile, templateFile))
+            {
+                ExcelWorksheet worksheet = package.Workbook.Worksheets[1];
+
+                worksheet.Cells["B2"].Value = FullName;
+                worksheet.Cells["B3"].Value = Helper.getDateTHAndTimeShortMonth(StartDate) + " " + "ถึง" + " " + Helper.getDateTHAndTimeShortMonth(EndDate);
+                int Rows = 7;
+                if (GetReports.Count() > 0)
+                {
+                    foreach (var GetReport in GetReports)
+                    {
+                        worksheet.Cells["A" + Rows].Value = Helper.getDateTHAndTimeShortMonth(GetReport.DetailsCreatedate);
+                        worksheet.Cells["B" + Rows].Value = GetReport.DetailsName;
+                        worksheet.Cells["C" + Rows].Value = GetReport.DetailWork;
+                        worksheet.Cells["D" + Rows].Value = Helper.getDateTHAndTimeShortMonth(GetReport.DetailsDueDate);
+                        if (GetReport.DetailsStatus == 100)
+                        {
+                            worksheet.Cells["E" + Rows].Value = "สำเร็จ";
+                        }
+                        else
+                        {
+                            worksheet.Cells["E" + Rows].Value = GetReport.DetailsStatus + "%";
+                        }
+                        worksheet.Cells["F" + Rows].Value = GetReport.DetailsNoteProblem;
+                        worksheet.Cells["G" + Rows].Value = GetReport.DetailsNoteSolve;
+                        Rows++;
+                    }
+                }
+                else
+                {
+                    worksheet.Cells["A7:G7"].Merge = true;
+                    worksheet.Cells["A7"].Value = "--- ไม่มีข้อมูลการติดตามสถานะการดำเนินงาน ---";
+                }
+                package.Save();
+            }
+
+            var mimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            return new FileStreamResult(new FileStream(newFilePath, FileMode.Open), mimeType);
+        }
+
     }
 }

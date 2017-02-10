@@ -1,33 +1,40 @@
-﻿@model RegisterViewModel
+﻿@using System.Collections.Generic
+@using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Http.Authentication
+@model ApplicationUser
+
 @{
-    ViewData["Title"] = "ลงทะเบียนเข้าใช้งาน";
+    ViewData["Title"] = "แก้ไขผู้ใช้";
 }
 
-<h2>@ViewData["Title"].</h2>
 
-<form asp-controller="Account" asp-action="Register" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="form-horizontal">
-    <h4>สร้างบัญชีผู้ใช้งานใหม่</h4>
+
+<form asp-controller="Users" asp-action="EditUsers" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="form-horizontal">
+    <h2>แก้ไขผู้ใช้</h2>
+
     <hr />
     <div asp-validation-summary="All" class="text-danger"></div>
     <div class="form-group">
-        <label asp-for="Username" class="col-md-2 control-label">ชื่อผู้ใช้</label>
-        <div class="col-md-10">
-            <input asp-for="Username" class="form-control" />
-            <span asp-validation-for="Username" class="text-danger"></span>
+        <label class="col-md-2 control-label">ชื่อผู้ใช้</label>
+        <div class="col-md-4">
+            <input asp-for="UserName" class="form-control" />
+            <span asp-validation-for="UserName" class="text-danger"></span>
+        </div>
+        <label  class="col-md-2 control-label">รหัสผ่าน</label>
+        <div class="col-md-4">
+            <input value="@Model.PasswordHash" class="form-control" type="hidden" name="OldPassword" id="OldPassword"/> 
+            <input type="password" class="form-control" asp-for="PasswordHash" />
         </div>
     </div>
     <div class="form-group">
-        <label asp-for="Password" class="col-md-2 control-label">รหัสผ่าน</label>
-        <div class="col-md-10">
-            <input asp-for="Password" class="form-control" />
-            <span asp-validation-for="Password" class="text-danger"></span>
+        <label  class="col-md-2 control-label">ยืนยันรหัสผ่านอีกครั้ง</label>
+        <div class="col-md-4">
+            <input class="form-control" type="password"  name="NewPasswordConfirm"/>
         </div>
-    </div>
-    <div class="form-group">
-        <label asp-for="ConfirmPassword" class="col-md-2 control-label">ยืนยันรหัสผ่านอีกครั้ง</label>
-        <div class="col-md-10">
-            <input asp-for="ConfirmPassword" class="form-control" />
-            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+        <label class="col-md-2 control-label">สิทธิ์การเข้าถึง</label>
+        <div class="col-md-4">
+            <input type="hidden" id="RoleId"  asp-for="Id">
+            @Html.DropDownList("RolesUpdate", (IEnumerable<SelectListItem>)ViewBag.Role, new { @class = "form-control" })
         </div>
     </div>
     <div class="form-group">
@@ -36,8 +43,6 @@
             <input asp-for="FirstName" class="form-control" />
             <span asp-validation-for="FirstName" class="text-danger"></span>
         </div>
-    </div>
-    <div class="form-group">
         <label asp-for="LastName" class="col-md-2 control-label">นามสกุล</label>
         <div class="col-md-4">
             <input asp-for="LastName" class="form-control" />
@@ -46,18 +51,15 @@
     </div>
     <div class="form-group">
         <label class="col-md-2 control-label">บริษัท</label>
-        <div class="col-md-10">
+        <div class="col-md-4">
             @Html.DropDownList("CompanyId", (IEnumerable<SelectListItem>)ViewBag.Company, new { @class = "form-control" })
         </div>
-    </div>
-    <div class="form-group" >
         <label class="col-md-2 control-label">แผนก</label>
-        <div class="col-md-10">
-            <select asp-for="UserDepartmentsId" id="DepartmentsId" style="width:100%" class="form-control"></select>
-            @*@Html.DropDownList("UserDepartmentsId", (IEnumerable<SelectListItem>)ViewBag.Department, new { @class = "form-control" })*@
+        <div class="col-md-4">
+            @*<select id="DeptCompanyId" name="DeptCompanyId" class="form-control"></select>*@
+            @Html.DropDownList("UserDepartmentsId", (IEnumerable<SelectListItem>)ViewBag.Departments, new { @class = "form-control" })
         </div>
     </div>
-   
     <div class="form-group">
         <label asp-for="Email" class="col-md-2 control-label">อีเมล</label>
         <div class="col-md-10">
@@ -78,10 +80,10 @@
     <script>
         $(document).ready(function () {
 
-
             $("#CompanyId").change(function () {
                 var CompanyId = $(this).val();
-                $.get("/Account/DepartmentsLists", { "DeptCompanyId": CompanyId }, function (rs) {
+                alert(CompanyId);
+                $.get("/Users/DepartmentsLists", { "DeptCompanyId": CompanyId }, function (rs) {
                     $("#DepartmentsId").html(rs);
                 });
             });

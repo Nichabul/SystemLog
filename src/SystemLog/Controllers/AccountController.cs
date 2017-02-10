@@ -13,10 +13,11 @@ using SystemLog.Models.AccountViewModels;
 using SystemLog.Services;
 using SystemLog.Data;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 namespace SystemLog.Controllers
 {
-    [Authorize]
+
     public class AccountController : Controller
     {
        
@@ -157,6 +158,7 @@ namespace SystemLog.Controllers
                     _logger.LogInformation(3, "User created a new account with password.");
                     return RedirectToLocal(returnUrl);
                 }
+
                 ViewBag.Company = new SelectList(DB.Companys.ToList(), "CompanyId", "CompanyName");
                 ViewBag.Department = new SelectList(DB.Departments.ToList(), "DepartmentsId", "DepartmentsName");
                 AddErrors(result);
@@ -164,6 +166,20 @@ namespace SystemLog.Controllers
 
             // If we got this far, something failed, redisplay form
             return View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> DepartmentsLists (int DeptCompanyId)
+        {
+            string Html = "";
+            var model = await DB.Departments.Where(b => b.DeptCompanyId == DeptCompanyId).ToListAsync();
+            Html += "<select>";
+            foreach (var department in model)
+            {
+                Html += "<option value='"+ department.DepartmentsId  + "'>" + department.DepartmentsName + "</option>";
+            }
+            Html += "</select>";
+            return Json(Html);
         }
 
         //

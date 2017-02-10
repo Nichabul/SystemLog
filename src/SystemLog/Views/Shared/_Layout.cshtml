@@ -1,8 +1,10 @@
 ﻿@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 @using SystemLog.Models;
 
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
+@inject RoleManager<IdentityRole> RoleManager
 @{ 
     var currentUser = await UserManager.FindByIdAsync(UserManager.GetUserId(User));
 }
@@ -39,12 +41,19 @@
                 </button>
                 <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">SystemLog</a>
             </div>
+
     <div class="navbar-collapse collapse">
-        <ul class="nav navbar-nav">
-            <li><a href="/Detail/Index">รายการการติดตามการดำเนินงาน</a></li>
-            <li><a href="/Detail/SearchReports">รายงานติดตามการดำเนินงาน</a></li>
-            <li><a asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>
-        </ul>
+
+   @if (SignInManager.IsSignedIn(User))
+   {
+    <ul class="nav navbar-nav">
+        <li><a href="/Detail/Index">รายการการติดตามสถาน</a></li>
+        <li><a href="/Detail/SearchReports">รายงานการติดตามสถานะ</a></li>
+        <li><a href="/Detail/SearchReportsAdmin">รายงานการติดตามสถานะ(Admin)</a></li>
+        <li><a href="/Users/Index">จัดการผู้ใช้(Admin)</a></li>
+    </ul>
+   }
+       
         @await Html.PartialAsync("_LoginPartial")
     </div>
 

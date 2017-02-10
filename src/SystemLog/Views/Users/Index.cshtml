@@ -1,0 +1,113 @@
+﻿@using System.Collections.Generic
+@using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Http.Authentication
+@using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+@model IEnumerable<SystemLog.Models.ApplicationUser>
+@inject SignInManager<ApplicationUser> SignInManager
+@inject RoleManager<IdentityRole> roleManager
+@{
+    ViewData["Title"] = "จัดการผู้ใช้";
+    var Helper = ViewBag.Helper as SystemLog.Helper.Utility;
+}
+
+<h2 style="margin-top: 40px; text-align:center;">@ViewData["Title"]</h2>
+<div class="row">
+    <div class="col-md-12">
+        <form asp-controller="Users" asp-action="Index" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="form-horizontal">
+            <div class="well">
+                <div style="text-align:center;">
+                    <div class="form-group">
+                        <label class="col-md-2 control-label">บริษัท</label>
+                        <div class="col-md-4">
+                            @Html.DropDownList("CompanyId", (IEnumerable<SelectListItem>)ViewBag.Company, new { @class = "form-control" })
+                        </div>
+                        <label class="col-md-2 control-label">แผนก</label>
+                        <div class="col-md-4">
+                            <select id="DeptCompanyId" name="DeptCompanyId" class="form-control"></select>
+                        </div>
+                        <button type="submit" class="btn btn-warning" id="search">ค้นหา</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+            <div style="text-align:right;">
+                <button type="button" class="btn btn-success" id="Adduser">เพิ่มผู้ใช้</button>
+            </div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th style="text-align:center">ชื่อ-สกุล</th>
+                        <th style="text-align:center">บริษัท</th>
+                        <th style="text-align:center">สิทธิ์การเข้าถึง</th>
+                        <th style="text-align:center">จัดการ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        if (Model.Count() > 0)
+                        {
+                            foreach (var User in Model)
+                            {
+                                var role = await roleManager.FindByIdAsync(User.Roles.FirstOrDefault().RoleId);
+                                <tr>
+                                    <td>@User.FirstName @User.LastName</td>
+                                    <td style="text-align:center">@User.Departments.Companys.CompanyName</td>
+                                    <td style="text-align:center">@role.Name</td>
+                                    <td style="text-align:center">
+                                        <button type="button" class="btn btn-info EditUser" value="@User.Id">แก้ไข</button>
+                                        <input type="hidden" class="Id" value="@User.Id">
+                                        <button type="button" class="btn btn-danger DeleteUser" value="@User.Id"> ลบ </button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <th colspan="7" style="text-align:center;color:red;">***ไม่มีข้อมูล User***</th>
+                            </tr>
+                        }
+
+                    }
+
+                </tbody>
+            </table>
+</div>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+<script>
+    $(document).ready(function () {
+        var Id = $("#CompanyId").val();
+            $("#CompanyId").change(function () {
+                var CompanyId = $(this).val();
+                $.get("/Users/DepartmentsLists", { "DeptCompanyId": CompanyId }, function (rs) {
+                    $("#DeptCompanyId").html(rs);
+                });
+            });
+            $("#CompanyId").val(Id).change();
+           
+            $(".EditUser").click(function () {
+                var Id = $(this).val();
+                window.location.href = "/Users/EditUsers?Id=" + Id;
+            });
+
+            $(".DeleteUser").click(function () {
+                var Id = $(this).val();
+                if (confirm("คุณต้องการลบ User นี้ใช่ไหม?")) {
+                    window.location.href = "/Users/DeleteUser?Id=" + Id;
+                    return true;
+                }else{
+                    return false;
+                }
+            });
+
+            $("#Adduser").click(function () {
+                window.location.href = "/Users/AddUsers";
+            });
+        });
+</script>
+}
+
+
