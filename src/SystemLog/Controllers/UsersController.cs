@@ -175,7 +175,7 @@ namespace SystemLog.Controllers
             
             return View(model);
         }
-
+        // Delete User
         [HttpGet]
         public async Task<IActionResult> DeleteUser(string Id)
         {
