@@ -129,7 +129,8 @@ namespace SystemLog.Controllers
         [HttpPost]
         [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditUsers(ApplicationUser model, string returnUrl, string RolesUpdate, string OldPassword, string Id)
+        public async Task<IActionResult> EditUsers(ApplicationUser model, string returnUrl, string RolesUpdate, string OldPassword, string Id,string NewPassword)
+
         {
             ViewData["ReturnUrl"] = returnUrl;
             string msg = "";
@@ -144,8 +145,21 @@ namespace SystemLog.Controllers
                     currentUser.Email = model.Email;
                     currentUser.UserDepartmentsId = model.UserDepartmentsId;
 
+                   
+
+                    string Password = "";
+                    if(NewPassword == null)
+                    {
+                        Password = OldPassword;
+                    }
+                    else
+                    {
+                        Password = NewPassword;
+                    }
+
                     var result = await _userManager.UpdateAsync(currentUser);
-                    var password = await _userManager.ChangePasswordAsync(currentUser, OldPassword, currentUser.PasswordHash);
+                    var code = await _userManager.GeneratePasswordResetTokenAsync(currentUser);
+                    var password = await _userManager.ResetPasswordAsync(currentUser, code, Password);
 
                     var OldId = await _userManager.FindByIdAsync(currentUser.Id);
                     var OldRoleId = DB.UserRoles.Where(a => a.UserId == OldId.Id).FirstOrDefault();
@@ -165,6 +179,7 @@ namespace SystemLog.Controllers
                     ViewBag.Company = new SelectList(DB.Companys.ToList(), "CompanyId", "CompanyName");
                     ViewBag.Department = new SelectList(DB.Departments.ToList(), "DepartmentsId", "DepartmentsName");
                     ViewBag.Role = new SelectList(await DB.Roles.ToListAsync(), "Name", "Name");
+
                     AddErrors(result);
                     return RedirectToAction("Index", "Users");
                 }

@@ -17,6 +17,7 @@ using Microsoft.EntityFrameworkCore;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using OfficeOpenXml;
+using System.Globalization;
 
 // For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -60,9 +61,13 @@ namespace SystemLog.Controllers
             return View("Index");
         }
 
-        public IActionResult Getreport()
+        public async Task<IActionResult> Getreport()
         {
             ViewBag.Helper = Helper;
+            var currentUser = await _userManager.FindByIdAsync(_userManager.GetUserId(User));
+            var Date = await DB.Details.Select(a => a.DetailsCreatedate).FirstOrDefaultAsync();
+            ViewBag.Data = DB.Details.Where(a=>a.DetailsUsersId == currentUser.Id && a.DetailsCreatedate == Date).ToList();
+            
             return PartialView("Getreport");
         }
         
@@ -230,28 +235,40 @@ namespace SystemLog.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SearchReports(DateTime StartDate, DateTime EndDate)
+        public async Task<IActionResult> SearchReports(string StartDate, string EndDate)
         {
             var currentUser = await _userManager.FindByIdAsync(_userManager.GetUserId(User));
+
             ViewBag.UserId = currentUser.Id;
             ViewBag.Helper = Helper;
             ViewBag.StartDate = StartDate;
             ViewBag.EndDate = EndDate;
 
-            var Searchreport = await DB.Details.Where(a => a.DetailsCreatedate >= StartDate && a.DetailsCreatedate <= EndDate
+            DateTime StartingDate = DateTime.ParseExact(StartDate, "dd/MM/yyyy", null);
+            DateTime EndingDate = DateTime.ParseExact(EndDate, "dd/MM/yyyy", null);
+
+            if(StartingDate > EndingDate)
+            {
+                
+            }
+
+            var Searchreport = await DB.Details.Where(a => a.DetailsCreatedate >= StartingDate && a.DetailsCreatedate <= EndingDate
                                                       && a.DetailsUsersId == currentUser.Id).ToListAsync();
             return View("SearchReports", Searchreport);
 
         }
         
         [Authorize]
-        public async Task<FileStreamResult> Exportreport(DateTime StartDate, DateTime EndDate, string UserId)
+        public async Task<FileStreamResult> Exportreport(string StartDate, string EndDate, string UserId)
         {
             var currentUser = await _userManager.FindByIdAsync(_userManager.GetUserId(User));
             UserId = currentUser.Id;
+            DateTime StartingDate = DateTime.ParseExact(StartDate, "dd/MM/yyyy", null);
+            DateTime EndingDate = DateTime.ParseExact(EndDate, "dd/MM/yyyy", null);
+
             string FullName = currentUser.FirstName + " " + currentUser.LastName;
 
-            var GetReports = DB.Details.Where(a => a.DetailsUsersId == UserId && a.DetailsCreatedate >= StartDate && a.DetailsCreatedate <= EndDate).ToList();
+            var GetReports = DB.Details.Where(a => a.DetailsUsersId == UserId && a.DetailsCreatedate >= StartingDate && a.DetailsCreatedate <= EndingDate).ToList();
 
 
 
@@ -266,7 +283,7 @@ namespace SystemLog.Controllers
                 ExcelWorksheet worksheet = package.Workbook.Worksheets[1];
 
                 worksheet.Cells["B2"].Value = FullName;
-                worksheet.Cells["B3"].Value = Helper.getDateTHAndTimeShortMonth(StartDate) + " " +"ถึง" + " " + Helper.getDateTHAndTimeShortMonth(EndDate);
+                worksheet.Cells["B3"].Value = Helper.getDateTHAndTimeShortMonth(StartingDate) + " " +"ถึง" + " " + Helper.getDateTHAndTimeShortMonth(EndingDate);
                 int Rows = 7;
                 if (GetReports.Count() > 0)
                 {
@@ -302,6 +319,8 @@ namespace SystemLog.Controllers
         }
 
         //Admin
+
+        //[Authorize("ADMIN")]
         [HttpGet]
         public async Task<IActionResult> SearchReportsAdmin(DateTime? StartDate, DateTime? EndDate, String UserId)
         {
@@ -327,7 +346,7 @@ namespace SystemLog.Controllers
             return View("SearchReportsAdmin", SearchReportAdmin);
         }
         [HttpPost]
-        public async Task<IActionResult> SearchReportsAdmin(DateTime StartDate, DateTime EndDate, String UserId)
+        public async Task<IActionResult> SearchReportsAdmin(string StartDate, string EndDate, String UserId)
         {
             ViewBag.UserId = UserId;
             ViewBag.Helper = Helper;
@@ -335,8 +354,10 @@ namespace SystemLog.Controllers
             ViewBag.EndDate = EndDate;
             ViewBag.Company = new SelectList(DB.Companys.ToList(), "CompanyId", "CompanyName");
 
-           
-            var SearchReportAdmin = await DB.Details.Where(a=> a.DetailsCreatedate >= StartDate && a.DetailsCreatedate <= EndDate
+            DateTime StartingDate = DateTime.ParseExact(StartDate, "dd/MM/yyyy", null);
+            DateTime EndingDate = DateTime.ParseExact(EndDate, "dd/MM/yyyy", null);
+
+            var SearchReportAdmin = await DB.Details.Where(a=> a.DetailsCreatedate >= StartingDate && a.DetailsCreatedate <= EndingDate
                                     && a.DetailsUsersId == UserId).ToListAsync();
            
 
@@ -361,13 +382,15 @@ namespace SystemLog.Controllers
         }
 
         [Authorize]
-        public async Task<FileStreamResult> ExportreportAdmin(DateTime StartDate, DateTime EndDate, string UserId)
+        public async Task<FileStreamResult> ExportreportAdmin(string StartDate, string EndDate, string UserId)
         {
             ViewBag.UserId = UserId;
+            DateTime StartingDate = DateTime.ParseExact(StartDate, "dd/MM/yyyy", null);
+            DateTime EndingDate = DateTime.ParseExact(EndDate, "dd/MM/yyyy", null);
             var User = await DB.Users.Where(a => a.Id == UserId).FirstOrDefaultAsync();
             var FullName = User.FirstName + " " + User.LastName;
 
-            var GetReports = await DB.Details.Where(a => a.DetailsCreatedate >= StartDate && a.DetailsCreatedate <= EndDate && a.DetailsUsersId == UserId).ToListAsync();
+            var GetReports = await DB.Details.Where(a => a.DetailsCreatedate >= StartingDate && a.DetailsCreatedate <= EndingDate && a.DetailsUsersId == UserId).ToListAsync();
 
             var templateFilePath = Path.Combine(_environment.WebRootPath.ToString(), "ReportTemplate/TemplateLogsystem.xlsx");
             FileInfo templateFile = new FileInfo(templateFilePath);
@@ -380,7 +403,7 @@ namespace SystemLog.Controllers
                 ExcelWorksheet worksheet = package.Workbook.Worksheets[1];
 
                 worksheet.Cells["B2"].Value = FullName;
-                worksheet.Cells["B3"].Value = Helper.getDateTHAndTimeShortMonth(StartDate) + " " + "ถึง" + " " + Helper.getDateTHAndTimeShortMonth(EndDate);
+                worksheet.Cells["B3"].Value = Helper.getDateTHAndTimeShortMonth(StartingDate) + " " + "ถึง" + " " + Helper.getDateTHAndTimeShortMonth(EndingDate);
                 int Rows = 7;
                 if (GetReports.Count() > 0)
                 {

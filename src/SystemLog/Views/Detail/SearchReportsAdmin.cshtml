@@ -30,11 +30,11 @@
                 <div class="form-group">
                     <label class="control-label col-md-2">วันที่เริ่มต้น</label>
                     <div class="SearchDate col-md-4">
-                        <input data-format="dd/MM/yyyy" type="text" class="form-control" name="StartDate" id="StartDate" value="@ViewBag.StartDate" />
+                        <input  type="text" class="form-control" name="StartDate" id="StartDate" value="@ViewBag.StartDate" />
                     </div>
                     <label class="control-label col-md-2">วันที่สิ้นสุด</label>
                     <div class="SearchDate col-md-4">
-                        <input data-format="dd/MM/yyyy" type="text" class="form-control" name="EndDate" id="EndDate" value="@ViewBag.EndDate" />
+                        <input  type="text" class="form-control" name="EndDate" id="EndDate" value="@ViewBag.EndDate" />
                     </div>
                 </div>
                 <div style="text-align:center;">
@@ -100,31 +100,38 @@
                                         </tr>
                                     }
                 }
+
             </tbody>
         </table>
     </div>
 </div>
 <input type="hidden" name="User" id="User" value="@ViewBag.UserId">
+
 @section Scripts {
 
     @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
     <script>
         $(document).ready(function () {
+
             var Id = $("#CompanyId").val();
-            $('#StartDate').datepicker({
-                autoclose: true,
-                language: 'th'
+
+            $("#StartDate").datepicker({
+                minDate: 0,
+                maxDate: "+4Y",
+                numberOfMonths: 2,
+                format: "dd/mm/yyyy"
             });
-            $('#EndDate').datepicker({
-                autoclose: true,
-                language: 'th'
+            $("#EndDate").datepicker({
+                minDate: 0,
+                maxDate: "+4Y",
+                numberOfMonths: 2,
+                format: "dd/mm/yyyy"
             });
 
             $("#Excelreport").click(function () {
                 var StartDate = $("#StartDate").val();
                 var EndDate = $("#EndDate").val();
                 var UserId = $("#User").val();
-                alert(UserId);
                 window.location.href = "/Detail/ExportreportAdmin?StartDate=" + StartDate + "&EndDate=" + EndDate + "&UserId=" + UserId;
             });
 
@@ -136,7 +143,6 @@
             });
 
             $("#CompanyId").val(Id).change();
-            
 
         });
     </script>

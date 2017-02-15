@@ -1,11 +1,11 @@
 ﻿@model IEnumerable<SystemLog.Models.Details>
 @{ 
     var Helper = ViewBag.Helper as SystemLog.Helper.Utility;
+    var Data = ViewBag.Data as IEnumerable<SystemLog.Models.Details>;
 }
 <table class="table">
     <thead>
         <tr>
-            @ViewBag.CountDetail
             <th style="text-align:center;">ลำดับ</th>
             <th style="text-align:center;">วันที่สร้างรายการ</th>
             <th style="text-align:center;">สถานะ</th>
@@ -39,10 +39,15 @@
                             }
                             else
                             {
-
-                                <button type="button" class="btn btn-info review" value="@dt">ดูรายการ</button>
-                                <button type="button" class="btn btn-danger manage" value="@dt"> จัดการ </button>
-
+                                if (Data.Where(a => a.DetailsCreatedate == dt).Count() > 0)
+                                {
+                                    <button type="button" class="btn btn-info review" value="@dt">ดูรายการ</button>
+                                    <button type="button" class="btn btn-danger manage" value="@dt"> จัดการ </button>
+                                }
+                                else
+                                {
+                                    <button type="button" class="btn btn-danger manage" value="@dt"> จัดการ </button>
+                                }
                             }
                         }
                     </td>

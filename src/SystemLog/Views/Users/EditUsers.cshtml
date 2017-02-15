@@ -23,13 +23,25 @@
         <label  class="col-md-2 control-label">รหัสผ่าน</label>
         <div class="col-md-4">
             <input value="@Model.PasswordHash" class="form-control" type="hidden" name="OldPassword" id="OldPassword"/> 
-            <input type="password" class="form-control" asp-for="PasswordHash" />
+            <input type="password" class="form-control" id="NewPassword" name="NewPassword" 
+                    data-bv-identical="true"
+                    data-bv-identical-field="ConfirmPassword"
+                    data-bv-identical-message="The password and its confirm are not the same"
+                    data-bv-different="true"
+                    data-bv-different-field="username"
+                    data-bv-different-message="The password cannot be the same as username"/>
         </div>
     </div>
     <div class="form-group">
         <label  class="col-md-2 control-label">ยืนยันรหัสผ่านอีกครั้ง</label>
         <div class="col-md-4">
-            <input class="form-control" type="password"  name="NewPasswordConfirm"/>
+            <input class="form-control" type="password"  name="NewPasswordConfirm"
+                   data-bv-identical="true"
+                   data-bv-identical-field="Password"
+                   data-bv-identical-message="The password and its Confirm Password are not the same"
+                   data-bv-different="true"
+                   data-bv-different-field="username"
+                   data-bv-different-message="The password cannot be the same as username" />
         </div>
         <label class="col-md-2 control-label">สิทธิ์การเข้าถึง</label>
         <div class="col-md-4">

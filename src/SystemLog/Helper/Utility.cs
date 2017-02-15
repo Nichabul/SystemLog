@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
 using SystemLog.Data;
 using Microsoft.AspNetCore.Hosting;
 using SystemLog.Services;
@@ -10,7 +6,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Identity;
 using SystemLog.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
 
 namespace SystemLog.Helper
 {
@@ -73,5 +68,7 @@ namespace SystemLog.Helper
             int Year = DateCheck.Year + 543;
             return Year;
         }
+        
+    
     }
 }

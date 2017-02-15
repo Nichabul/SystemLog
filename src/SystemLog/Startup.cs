@@ -12,11 +12,13 @@ using Microsoft.Extensions.Logging;
 using SystemLog.Data;
 using SystemLog.Models;
 using SystemLog.Services;
+using Microsoft.AspNetCore.Identity;
 
 namespace SystemLog
 {
     public class Startup
     {
+
         public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
@@ -48,9 +50,15 @@ namespace SystemLog
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddIdentity<ApplicationUser, IdentityRole>()
-                .AddEntityFrameworkStores<ApplicationDbContext>()
-                .AddDefaultTokenProviders();
+            services.AddIdentity<ApplicationUser, IdentityRole>(options=>
+            {
+                options.Password.RequireDigit = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequiredLength = 6;
+
+            }).AddEntityFrameworkStores<ApplicationDbContext>()
+              .AddDefaultTokenProviders();
 
             services.AddMvc();
 
@@ -83,9 +91,9 @@ namespace SystemLog
             app.UseStaticFiles();
 
             app.UseIdentity();
-
+            
             // Add external authentication middleware below. To configure them please see http://go.microsoft.com/fwlink/?LinkID=532715
-
+            
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
