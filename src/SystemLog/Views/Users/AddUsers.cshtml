@@ -10,15 +10,17 @@
     <div asp-validation-summary="All" class="text-danger"></div>
     <div class="form-group">
         <label asp-for="Username" class="col-md-2 control-label">ชื่อผู้ใช้</label>
-        <div class="col-md-4">
+        <div class="col-md-10">
             <input asp-for="Username" class="form-control" />
             <span asp-validation-for="Username" class="text-danger"></span>
         </div>
+    </div>
+    <div class="form-group">
         <label asp-for="Password" class="col-md-2 control-label">รหัสผ่าน</label>
-        <div class="col-md-4">
+        <div class="col-md-10">
             <input asp-for="Password" class="form-control" />
             <span asp-validation-for="Password" class="text-danger"></span>
-        </div>
+        </div>    
     </div>
     <div class="form-group">
         <label asp-for="ConfirmPassword" class="col-md-2 control-label">ยืนยันรหัสผ่านอีกครั้ง</label>
@@ -26,8 +28,10 @@
             <input asp-for="ConfirmPassword" class="form-control" />
             <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
         </div>
+    </div>
+    <div class="form-group">
         <label class="col-md-2 control-label">สิทธิ์การเข้าถึง</label>
-        <div class="col-md-4">
+        <div class="col-md-10">
             @Html.DropDownList("RoleId", (IEnumerable<SelectListItem>)ViewBag.Role, new { @class = "form-control" })
         </div>
     </div>
@@ -37,17 +41,22 @@
             <input asp-for="FirstName" class="form-control" />
             <span asp-validation-for="FirstName" class="text-danger"></span>
         </div>
+    </div>
+    <div class="form-group">
         <label asp-for="LastName" class="col-md-2 control-label">นามสกุล</label>
         <div class="col-md-4">
             <input asp-for="LastName" class="form-control" />
             <span asp-validation-for="LastName" class="text-danger"></span>
         </div>
     </div>
+   
     <div class="form-group">
         <label class="col-md-2 control-label">บริษัท</label>
         <div class="col-md-4">
             @Html.DropDownList("CompanyId", (IEnumerable<SelectListItem>)ViewBag.Company, new { @class = "form-control" })
         </div>
+    </div>
+    <div class="form-group">
         <label class="col-md-2 control-label">แผนก</label>
         <div class="col-md-4">
             <select asp-for="UserDepartmentsId" id="DepartmentsId" style="width:100%" class="form-control"></select>
@@ -61,7 +70,7 @@
         </div>
     </div>
     <div class="form-group">
-        <div class="col-md-offset-6 col-md-6">
+        <div>
             <button type="submit" class="btn btn-default">Register</button>
         </div>
     </div>

@@ -70,6 +70,9 @@
                     {
                         foreach (var Searchreport in Model)
                         {
+                            @*<tr>
+                                <th colspan="7">@Searchreport.Users.FirstName @Searchreport.Users.LastName</th>
+                            </tr>*@
                             <tr>
                                 <th>@Helper.getDateTHAndTimeShortMonth(Searchreport.DetailsCreatedate)</th>
                                 <th>@Searchreport.DetailsName</th>
@@ -83,7 +86,7 @@
                                     }
                                     else
                                     {
-                                        <th>@Searchreport.DetailsStatus</th>
+                                        <th>@Searchreport.DetailsStatus %</th>
 
                                     }
                                 }
@@ -143,6 +146,16 @@
             });
 
             $("#CompanyId").val(Id).change();
+
+            $("#search").click(function () {
+                var StartDate = $("#StartDate").val();
+                var EndDate = $("#EndDate").val();
+                if (StartDate > EndDate) {
+                    alert("วันที่เริ่มต้นมากกว่าวันที่สิ้นสุด กรุณาตรวจสอบใหม่อีกครั้ง");
+                    return false;
+                }
+                return true;
+            });
 
         });
     </script>

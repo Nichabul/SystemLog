@@ -65,8 +65,8 @@ namespace SystemLog.Controllers
         {
             ViewBag.Helper = Helper;
             var currentUser = await _userManager.FindByIdAsync(_userManager.GetUserId(User));
-            var Date = await DB.Details.Select(a => a.DetailsCreatedate).FirstOrDefaultAsync();
-            ViewBag.Data = DB.Details.Where(a=>a.DetailsUsersId == currentUser.Id && a.DetailsCreatedate == Date).ToList();
+           // var Date = await DB.Details.Select(a => a.DetailsCreatedate).FirstOrDefaultAsync();
+            ViewBag.Data = DB.Details.Where(a=>a.DetailsUsersId == currentUser.Id).ToList();
             
             return PartialView("Getreport");
         }
@@ -93,7 +93,7 @@ namespace SystemLog.Controllers
                     var detailremove = DB.Details.Where(b => b.DetailsCreatedate == CreateDate).ToList();
                     DB.Details.RemoveRange(detailremove);
                     DB.SaveChanges();
-
+                   
                     int FieldCount = DetailWork.Count();
                     for (int i = 0; i < FieldCount; i++)
                     {
@@ -139,6 +139,8 @@ namespace SystemLog.Controllers
             }
             return RedirectToAction("index");
         }
+        
+
         public async Task<IActionResult> Reportdetail(DateTime date)
         {
             var currentUser = await _userManager.FindByIdAsync(_userManager.GetUserId(User));
@@ -213,7 +215,7 @@ namespace SystemLog.Controllers
 
             var currentUser = await _userManager.FindByIdAsync(_userManager.GetUserId(User));
 
-            if(StartDate == null || StartDate == DateTime.MinValue)
+            if (StartDate == null || StartDate == DateTime.MinValue)
             {
                StartDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
             }
@@ -222,14 +224,18 @@ namespace SystemLog.Controllers
                 var DayInMonth = DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month);
                 EndDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DayInMonth);
             }
+
+            var StartDates = Convert.ToDateTime(StartDate).ToString("dd/MM/yyyy");
+            var EndDates = Convert.ToDateTime(EndDate).ToString("dd/MM/yyyy");
+
             ViewBag.Helper = Helper;
-            ViewBag.StartDate = StartDate;
-            ViewBag.EndDate = EndDate;
+            ViewBag.StartDate = StartDates;
+            ViewBag.EndDate = EndDates;
             ViewBag.UserId = currentUser.Id;
 
 
             var Searchreport = await DB.Details.Where(a => a.DetailsCreatedate >= StartDate && a.DetailsCreatedate <= EndDate
-                                                    && a.DetailsUsersId == currentUser.Id).ToListAsync();
+                                                    && a.DetailsUsersId == currentUser.Id).OrderBy(b=>b.DetailsCreatedate).ToListAsync();
 
             return View("SearchReports", Searchreport);
         }
@@ -247,17 +253,13 @@ namespace SystemLog.Controllers
             DateTime StartingDate = DateTime.ParseExact(StartDate, "dd/MM/yyyy", null);
             DateTime EndingDate = DateTime.ParseExact(EndDate, "dd/MM/yyyy", null);
 
-            if(StartingDate > EndingDate)
-            {
-                
-            }
-
             var Searchreport = await DB.Details.Where(a => a.DetailsCreatedate >= StartingDate && a.DetailsCreatedate <= EndingDate
-                                                      && a.DetailsUsersId == currentUser.Id).ToListAsync();
+                                                      && a.DetailsUsersId == currentUser.Id).OrderBy(b => b.DetailsCreatedate).ToListAsync();
             return View("SearchReports", Searchreport);
 
         }
-        
+
+     
         [Authorize]
         public async Task<FileStreamResult> Exportreport(string StartDate, string EndDate, string UserId)
         {
@@ -268,7 +270,7 @@ namespace SystemLog.Controllers
 
             string FullName = currentUser.FirstName + " " + currentUser.LastName;
 
-            var GetReports = DB.Details.Where(a => a.DetailsUsersId == UserId && a.DetailsCreatedate >= StartingDate && a.DetailsCreatedate <= EndingDate).ToList();
+            var GetReports = DB.Details.Where(a => a.DetailsUsersId == UserId && a.DetailsCreatedate >= StartingDate && a.DetailsCreatedate <= EndingDate).OrderBy(b => b.DetailsCreatedate).ToList();
 
 
 
@@ -326,6 +328,7 @@ namespace SystemLog.Controllers
         {
             var currentUser = await _userManager.FindByIdAsync(_userManager.GetUserId(User));
 
+
             if (StartDate == null || StartDate == DateTime.MinValue)
             {
                 StartDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
@@ -335,14 +338,18 @@ namespace SystemLog.Controllers
                 var DayInMonth = DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month);
                 EndDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DayInMonth);
             }
+
+            var StartDates = Convert.ToDateTime(StartDate).ToString("dd/MM/yyyy");
+            var EndDates = Convert.ToDateTime(EndDate).ToString("dd/MM/yyyy");
+
             ViewBag.Helper = Helper;
-            ViewBag.StartDate = StartDate;
-            ViewBag.EndDate = EndDate;
+            ViewBag.StartDate = StartDates;
+            ViewBag.EndDate = EndDates;
             ViewBag.UserId = UserId;
 
             ViewBag.Company = new SelectList(DB.Companys.ToList(), "CompanyId", "CompanyName");
             var SearchReportAdmin = await DB.Details.Where(a => a.DetailsCreatedate >= StartDate && a.DetailsCreatedate <= EndDate
-                             && a.DetailsUsersId == UserId).ToListAsync();
+                             && a.DetailsUsersId == UserId).OrderBy(b => b.DetailsCreatedate).ToListAsync();
             return View("SearchReportsAdmin", SearchReportAdmin);
         }
         [HttpPost]
@@ -358,7 +365,7 @@ namespace SystemLog.Controllers
             DateTime EndingDate = DateTime.ParseExact(EndDate, "dd/MM/yyyy", null);
 
             var SearchReportAdmin = await DB.Details.Where(a=> a.DetailsCreatedate >= StartingDate && a.DetailsCreatedate <= EndingDate
-                                    && a.DetailsUsersId == UserId).ToListAsync();
+                                    && a.DetailsUsersId == UserId).OrderBy(b => b.DetailsCreatedate).ToListAsync();
            
 
             return View("SearchReportsAdmin", SearchReportAdmin);
@@ -390,7 +397,7 @@ namespace SystemLog.Controllers
             var User = await DB.Users.Where(a => a.Id == UserId).FirstOrDefaultAsync();
             var FullName = User.FirstName + " " + User.LastName;
 
-            var GetReports = await DB.Details.Where(a => a.DetailsCreatedate >= StartingDate && a.DetailsCreatedate <= EndingDate && a.DetailsUsersId == UserId).ToListAsync();
+            var GetReports = await DB.Details.Where(a => a.DetailsCreatedate >= StartingDate && a.DetailsCreatedate <= EndingDate && a.DetailsUsersId == UserId).OrderBy(b => b.DetailsCreatedate).ToListAsync();
 
             var templateFilePath = Path.Combine(_environment.WebRootPath.ToString(), "ReportTemplate/TemplateLogsystem.xlsx");
             FileInfo templateFile = new FileInfo(templateFilePath);

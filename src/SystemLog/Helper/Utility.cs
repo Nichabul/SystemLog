@@ -60,7 +60,7 @@ namespace SystemLog.Helper
         {
             string month = getMonthShort(DateCheck.Month);
             int Year = DateCheck.Year + 543;
-            return DateCheck.ToString("dd ") + month + " " + Year.ToString();
+            return DateCheck.ToString("dd") + month + " " + Year.ToString();
         }
 
         public int getYearTH(DateTime DateCheck)
@@ -69,6 +69,10 @@ namespace SystemLog.Helper
             return Year;
         }
         
+        //public DateTime ConvertDate()
+        //{
+           
+        //}
     
     }
 }

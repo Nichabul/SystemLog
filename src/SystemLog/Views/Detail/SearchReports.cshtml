@@ -10,23 +10,26 @@
 @{
     ViewData["Title"] = "ค้นหารายการการติดตามสถานะการดำเนินการ";
     var Helper = ViewBag.Helper as SystemLog.Helper.Utility;
+    //  @ViewBag.MsgDate;
 }
 
 <h2 style="margin-top: 40px; text-align:center;">@ViewData["Title"]</h2>
+
     <div class="row">
         <div class="col-md-12">
             <div class="well" style="padding:45px;">
-                <form asp-controller="Detail" asp-action="SearchReports"asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="form-horizontal">
+                <form asp-controller="Detail"  asp-action="SearchReports"asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="form-horizontal" id="Form-Search">
                 <div style="text-align:center;">
                     <label class="control-label col-md-2">วันที่เริ่มต้น</label>
                     <div class="SearchDate col-md-3">
+                       
                         <input  type="text" class="form-control" name="StartDate" id="StartDate" value="@ViewBag.StartDate"/>
                     </div>
                     <label class="control-label col-md-2">วันที่สิ้นสุด</label>
                     <div class="SearchDate col-md-3">
                         <input type="text" class="form-control" name="EndDate" id="EndDate" value="@ViewBag.EndDate"/>
                     </div>
-                    <button type="submit" class="btn btn-warning col-md-1" id="search">ค้นหา</button>
+                    <button  class="btn btn-warning col-md-1" id="search">ค้นหา</button>
                 </div>
                 </form>
             </div>
@@ -62,6 +65,7 @@
                                     <th>@Helper.getDateTHAndTimeShortMonth(Searchreport.DetailsCreatedate)</th>
                                     <th>@Searchreport.DetailsName</th>
                                     <th>@Searchreport.DetailWork</th>
+                                    @{ }
                                     <th>@Helper.getDateTHAndTimeShortMonth(Searchreport.DetailsDueDate)</th>
                                     @{
                                         if (Searchreport.DetailsStatus == 100)
@@ -81,7 +85,8 @@
                             }
 
                        } else{
-                                <tr>
+                           
+                                <tr>    
                                      <th colspan="7" style="text-align:center;color:red;">***ไม่มีข้อมูลการติดตามสถานะการดำเนินงาน***</th>
                                 </tr>
                       }
@@ -96,6 +101,7 @@
     @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
     <script>
         $(document).ready(function () {
+
             $("#StartDate").datepicker({
                 minDate: 0,
                 maxDate: "+4Y",
@@ -109,10 +115,6 @@
                 numberOfMonths: 2,
                 format: "dd/mm/yyyy"
             });
-            //$('#EndDate').datepicker({
-            //    autoclose: true,
-            //    language: 'th'
-            //});
 
             $("#Excelreport").click(function () {
                 var StartDate = $("#StartDate").val();
@@ -120,7 +122,30 @@
                 var UserId = $("#UserId").val();
                 window.location.href = "/Detail/Exportreport?StartDate=" + StartDate + "&EndDate=" + EndDate + "&UserId" + UserId;
             });
+
+            $("#search").click(function () {
+                var StartDate = $("#StartDate").val();
+                var EndDate = $("#EndDate").val();
+                if (StartDate > EndDate) {
+                    alert("วันที่เริ่มต้นมากกว่าวันที่สิ้นสุด กรุณาตรวจสอบใหม่อีกครั้ง");
+                    return false;
+                }
+
+                return true;
+            });
         });
     </script>
+
+    @*<script>
+        function Search() {
+            var StartDate = $("#StartDate").val();
+            var EndDate = $("#EndDate").val();
+            if (StartDate > EndDate) {
+                alert("วันที่เริ่มต้นมากกว่าวันที่สิ้นสุด กรุณาตรวจสอบใหม่อีกครั้ง");
+            }
+            document.getElementById("Form-Search").submit();
+        }
+    </script>*@
+   
 
 }

@@ -12,11 +12,12 @@
     var Helper = ViewBag.Helper as SystemLog.Helper.Utility;
 }
 <h2 style="margin-top: 40px; text-align:center;">@ViewData["Title"]</h2>
-<form asp-controller="Detail" asp-action="ManageDetails" id="addreport" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="form-horizontal">
-    @*<div asp-validation-summary="All" class="text-danger"></div>*@
-  วันที่สร้างรายการ :  @Helper.getDateTHAndTimeShortMonth(ViewBag.date)
-    
-   
+<form asp-controller="Detail" asp-action="ManageDetails" id="addreport" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="form-horizontal" data-toggle="validator">
+
+    <div asp-validation-summary="All" class="text-danger"></div>
+    วันที่สร้างรายการ :  @Helper.getDateTHAndTimeShortMonth(ViewBag.date)
+
+
     <div>
         <div style="text-align:right;">
             <button type="button" class="btn btn-success" id="Addrow">เพิ่มรายการ</button>
@@ -38,40 +39,42 @@
                     var Getreports = ViewBag.GetReport as IEnumerable<SystemLog.Models.Details>;
                     if (Getreports.Count() > 0)
                     {
-                        foreach (var Report in Getreports.Where(user=>user.DetailsUsersId == ViewBag.UserId))
+                        foreach (var Report in Getreports.Where(user => user.DetailsUsersId == ViewBag.UserId))
                         {
                             <tr>
                                 <td>
                                     <input type="hidden" name="UserId[]" value="@ViewBag.UserId">
                                     <input type="hidden" name="DetailsCreatedate[]" value="@ViewBag.date" />
                                     <input type="hidden" name="CreateDate" value="@ViewBag.date" />
+                                    <input type="hidden" name="Id" id="Id" value="@Report.DetailsID" />
+
                                     <input type="text" name="DetailsName[]" class="form-control" value="@Report.DetailsName"/>
-                                    <span asp-validation-for="DetailsName" class="text-danger" ></span>
+                                    <span asp-validation-for="DetailsName" class="text-danger"></span>
                                 </td>
                                 <td>
-                                    <input type="text" name="DetailWork[]" class="form-control" value="@Report.DetailWork"/>
+                                    <input type="text" id="DetailWork" name="DetailWork[]" class="form-control" value="@Report.DetailWork" />
                                     <span asp-validation-for="DetailWork" class="text-danger"></span>
                                 </td>
-                                <td>
-                                    <div class="DetailsDueDate">
-                                        <input data-format="dd/MM/yyyy" type="text" class="add-on form-control " name="DetailsDueDate[]" value="@Report.DetailsDueDate">
+                                <td>  
+                                    <div>
+                                        <input data-format="dd/MM/yyyy" type="text" class="form-control DetailsDueDate" name="DetailsDueDate[]" value="@Report.DetailsDueDate" >
                                     </div>
                                     <span asp-validation-for="DetailsDueDate" class="text-danger"></span>
                                 </td>
                                 <td>
-                                    <input type="text" name="DetailsStatus[]" class="form-control" placeholder="0%" value="@Report.DetailsStatus"/>
+                                    <input type="number" name="DetailsStatus[]" class="form-control" placeholder="0" value="@Report.DetailsStatus" maxlength="3" />
                                     <span asp-validation-for="DetailsStatus" class="text-danger"></span>
                                 </td>
                                 <td>
-                                    <input type="text" name="DetailsNoteProblem[]" class="form-control" value="@Report.DetailsNoteProblem"/>
+                                    <input type="text" name="DetailsNoteProblem[]" class="form-control" value="@Report.DetailsNoteProblem" />
                                     <span asp-validation-for="DetailsNoteProblem" class="text-danger"></span>
                                 </td>
                                 <td>
-                                    <input type="text" name="DetailsNoteSolve[]" class="form-control" value="@Report.DetailsNoteSolve"/>
+                                    <input type="text" name="DetailsNoteSolve[]" class="form-control" value="@Report.DetailsNoteSolve" />
                                     <span asp-validation-for="DetailsNoteSolve" class="text-danger"></span>
                                 </td>
                                 <td>
-                                    <button type="button" class="del btn-danger">ลบ</button>
+                                    <button type="button" class="del btn-danger" value="@Report.DetailsID">ลบ</button>
                                 </td>
                             </tr>
                         }
@@ -84,29 +87,29 @@
                                 <input type="hidden" name="UserId[]" value="@ViewBag.UserId">
                                 <input type="hidden" name="DetailsCreatedate[]" value="@ViewBag.date" />
                                 <input type="hidden" name="CreateDate" value="@ViewBag.date" />
-                                <input type="text" name="DetailsName[]" class="form-control" />
+                                <input type="text" name="DetailsName[]" class="form-control" required/>
                                 <span asp-validation-for="DetailsName" class="text-danger"></span>
                             </td>
                             <td>
-                                <input type="text" name="DetailWork[]" class="form-control" />
+                                <input type="text" id="DetailWork" name="DetailWork[]" class="form-control" required/>
                                 <span asp-validation-for="DetailWork" class="text-danger"></span>
                             </td>
                             <td>
-                                <div class="DetailsDueDate">
-                                    <input data-format="dd/MM/yyyy" type="text" class="add-on form-control " name="DetailsDueDate[]">
+                                <div>
+                                    <input data-format="dd/MM/yyyy" type="text" class="form-control DetailsDueDate" name="DetailsDueDate[]" required>
                                 </div>
                                 <span asp-validation-for="DetailsDueDate" class="text-danger"></span>
                             </td>
                             <td>
-                                <input type="text" name="DetailsStatus[]" class="form-control" placeholder="0%" />
+                                <input type="number" name="DetailsStatus[]" class="form-control" placeholder="0" required min="0" max="100"/>
                                 <span asp-validation-for="DetailsStatus" class="text-danger"></span>
                             </td>
                             <td>
-                                <input type="text" name="DetailsNoteProblem[]" class="form-control" />
+                                <input type="text" name="DetailsNoteProblem[]" class="form-control" required/>
                                 <span asp-validation-for="DetailsNoteProblem" class="text-danger"></span>
                             </td>
                             <td>
-                                <input type="text" name="DetailsNoteSolve[]" class="form-control" />
+                                <input type="text" name="DetailsNoteSolve[]" class="form-control" required/>
                                 <span asp-validation-for="DetailsNoteSolve" class="text-danger"></span>
                             </td>
                             <td>
@@ -115,16 +118,20 @@
                         </tr>
                     }
                 }
-               
+
             </tbody>
         </table>
     </div>
     <div class="form-group">
         <div class="row ">
             <div class="col-lg-12">
-                <button type="submit" class="btn btn-default">Save</button> 
-            </div>  
-        </div> 
+                <button type="submit" class="btn btn-default">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+
     </div>
 </form>
 
@@ -141,33 +148,38 @@
 
         var stringHtml = '<tr>'
                          + '<input type="hidden" name="UserId[]" value="@ViewBag.UserId">'
-                         + '<td><input type="hidden" name="DetailsCreatedate[]" value="@ViewBag.date">'
-                         + '<input type="text" name="DetailsName[]" class="form-control" style="margin-bottom:5px;"></td>'
-                         + '<td><input type="text" name="DetailWork[]" class="form-control" style="margin-bottom:5px;"></td>'
-                         + '<td><div class="DetailsDueDate"><input data-format="dd/MM/yyyy" type="text" class="add-on form-control" name="DetailsDueDate[]"></div></td>'
-                         + '<td><input type="number" name="DetailsStatus[]" class="form-control" style="margin-bottom:5px;"></td>'
-                         + '<td><input type="text" name="DetailsNoteProblem[]" class="form-control" style="margin-bottom:5px;"></td>'
-                         + '<td><input type="text" name="DetailsNoteSolve[]" class="form-control" style="margin-bottom:5px;"></td>'
+                         + '<td><input type="hidden" id="DetailWork" name="DetailsCreatedate[]" value="@ViewBag.date">'
+                         + '<input type="text" name="DetailsName[]" class="form-control" style="margin-bottom:5px;" required></td>'
+                         + '<td><input type="text" name="DetailWork[]" class="form-control" style="margin-bottom:5px;" required></td>'
+                         + '<td><div class=""><input data-format="dd/MM/yyyy" type="text" class="form-control DetailsDueDate" name="DetailsDueDate[]" required></div></td>'
+                         + '<td><input type="number" name="DetailsStatus[]" class="form-control" style="margin-bottom:5px;"  placeholder="0" required  maxlength="3"></td>'
+                         + '<td><input type="text" name="DetailsNoteProblem[]" class="form-control" style="margin-bottom:5px;" required></td>'
+                         + '<td><input type="text" name="DetailsNoteSolve[]" class="form-control" style="margin-bottom:5px;" required></td>'
                          + '<td><button type="button" class="del btn-danger">ลบ</button></td>'
                          + '</tr>';
 
        $("#Addrow").click(function () {
            $("table tbody").append(stringHtml);
-
-           $('.DetailsDueDate').datetimepicker({
-               language: 'en',
-               pick12HourFormat: true
+           $('.DetailsDueDate').datepicker({
+               language: 'en'
            });
         });
 
-       $("#addreport").on("click",".del",function () {
-           $(this).closest('tr').remove();
+       $("#addreport").on("click", ".del", function () {
+           var Id = $(this).val();
+           if (confirm("คุณต้องการลบ ใช่ไหม?")) {
+               //window.location.href = "/Detail/DeleteDetail?Id=" + Id;
+               $(this).closest('tr').remove();
+               return true;
+           } else {
+               return false;
+           }
        });
 
-       $('.DetailsDueDate').datetimepicker({
-           language: 'en',
-           pick12HourFormat: true
+       $('.DetailsDueDate').datepicker({
+           language: 'en' 
        });
+
     });
 </script>
 

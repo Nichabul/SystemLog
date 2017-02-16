@@ -8,12 +8,11 @@
         <tr>
             <th style="text-align:center;">ลำดับ</th>
             <th style="text-align:center;">วันที่สร้างรายการ</th>
-            <th style="text-align:center;">สถานะ</th>
+            @*<th style="text-align:center;">สถานะ</th>*@
             <th style="text-align:center;">จัดการ</th>
         </tr>
     </thead>
     <tbody>
-
         @{
             int Date = DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month);
             for (int Day = 1; Day <= Date; Day++)
@@ -30,7 +29,7 @@
                     }
                     <td style="text-align:center;background-color:@Bgcolor;">@Day</td>
                     <td style="text-align:center;background-color:@Bgcolor;">@Helper.getDateTHAndTimeShortMonth(dt)</td>
-                    <td style="text-align:center;background-color:@Bgcolor;">สถานะ</td>
+                    @*<td style="text-align:center;background-color:@Bgcolor;">สถานะ</td>*@
                     <td style="text-align:center;background-color:@Bgcolor;">
                         @{
                             if (Convert.ToString(dt.DayOfWeek) == "Saturday" || Convert.ToString(dt.DayOfWeek) == "Sunday")

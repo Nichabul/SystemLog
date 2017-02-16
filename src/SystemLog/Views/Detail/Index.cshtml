@@ -17,21 +17,21 @@
                 <label class="control-label col-md-2" >เดือน : </label>
                 <select class="form-control col-md-4" id="Month">
                     @{
-                        //int year = DateTime.DaysInMonth(DateTime.Now.DayOfYear,);
-                        for (int i = 1; i < 13; i++)
+                        for (int Month = 1; Month < 13; Month++)
                         {
-                            <option value="@i">@Helper.getMonth(i)</option>
+                            <option value="@Month">@Helper.getMonth(Month)</option>
                         }
-                       
+
                     }
                 </select>
                 <label class="control-label col-md-2">ปี : </label>
                 <select class="form-control col-md-4" id="Year">
                     @{
-                        for (int s = 2017; s <= 3001; s++)
-                        {
 
-                            <option value="@s">@s</option>
+                       // int Year = DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month);
+                        for (int Years = 2017; Years <= 2020; Years++)
+                        {
+                            <option value="@Years">@Years</option>
                         }
                     }
                 </select>

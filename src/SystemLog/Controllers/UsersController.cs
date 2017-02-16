@@ -151,15 +151,17 @@ namespace SystemLog.Controllers
                     if(NewPassword == null)
                     {
                         Password = OldPassword;
-                    }
+                     }
                     else
                     {
                         Password = NewPassword;
+                        var code = await _userManager.GeneratePasswordResetTokenAsync(currentUser);
+                        var password = await _userManager.ResetPasswordAsync(currentUser, code, Password);
                     }
 
                     var result = await _userManager.UpdateAsync(currentUser);
-                    var code = await _userManager.GeneratePasswordResetTokenAsync(currentUser);
-                    var password = await _userManager.ResetPasswordAsync(currentUser, code, Password);
+                    
+                   
 
                     var OldId = await _userManager.FindByIdAsync(currentUser.Id);
                     var OldRoleId = DB.UserRoles.Where(a => a.UserId == OldId.Id).FirstOrDefault();
