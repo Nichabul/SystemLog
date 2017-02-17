@@ -19,7 +19,16 @@
                     @{
                         for (int Month = 1; Month < 13; Month++)
                         {
-                            <option value="@Month">@Helper.getMonth(Month)</option>
+                            if (Month == DateTime.Now.Month)
+                            {
+                                <option value="@Month" selected="selected">@Helper.getMonth(Month)</option>
+                            }
+                            else
+                            {
+                                <option value="@Month">@Helper.getMonth(Month)</option>
+
+                            }
+
                         }
 
                     }
@@ -27,11 +36,10 @@
                 <label class="control-label col-md-2">ปี : </label>
                 <select class="form-control col-md-4" id="Year">
                     @{
-
-                       // int Year = DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month);
-                        for (int Years = 2017; Years <= 2020; Years++)
+                        var currentYear = DateTime.Today.Year;
+                        for (int Year = 2017; Year <= currentYear; Year++)
                         {
-                            <option value="@Years">@Years</option>
+                            <option value="@Year">@Year</option>
                         }
                     }
                 </select>
@@ -46,35 +54,40 @@
     @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 
     <script>
-        $(function () {
-            var month = $("#Month").val();
-            var year = $("#Year").val();
-            Getreports(month, year);
-            $("#search").click(function () {
+        $(document).ready(function () {
+            $(function () {
                 var month = $("#Month").val();
                 var year = $("#Year").val();
                 Getreports(month, year);
-            });
-        });
-        function Getreports(month, year) {
-            $.get("/Detail/Getreport", {"month":month,"year":year}, function (callback) {
-                $("#Viewreport").html(callback);
-                //คลิกปุุ่ม จัดการไปยังหน้าจัดการรายการการติดตามสถานะการดำเนินงาน
-                $(".manage").click(function () {
-                    var date = $(this).val();
-                    window.location.href = "/Detail/ManageDetails?date=" + date;
-
+                $("#search").click(function () {
+                    var month = $("#Month").val();
+                    var year = $("#Year").val();
+                    Getreports(month, year);
                 });
-
-                $(".review").click(function () {  
-                    var date = $(this).val();
-                    window.location.href = "/Detail/Reportdetail?date=" + date;
-
-                })
             });
-        }
 
-        
+            function Getreports(month, year) {
+                $.get("/Detail/Getreport", { "month": month, "year": year }, function (callback) {
+                    $("#Viewreport").html(callback);
+                    //คลิกปุุ่ม จัดการไปยังหน้าจัดการรายการการติดตามสถานะการดำเนินงาน
+                    $(".manage").click(function () {
+                        var date = $(this).val();
+                        window.location.href = "/Detail/ManageDetails?date=" + date;
+
+                    });
+
+                    $(".review").click(function () {
+                        var date = $(this).val();
+                        window.location.href = "/Detail/Reportdetail?date=" + date;
+
+                    });
+                });
+            }
+
+           
+
+
+        });
 
     </script>
 }

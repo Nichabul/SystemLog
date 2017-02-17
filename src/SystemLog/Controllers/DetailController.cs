@@ -61,13 +61,14 @@ namespace SystemLog.Controllers
             return View("Index");
         }
 
-        public async Task<IActionResult> Getreport()
+        public async Task<IActionResult> Getreport(int month, int year)
         {
             ViewBag.Helper = Helper;
+            ViewBag.Month = month;
+            ViewBag.Year = year;
             var currentUser = await _userManager.FindByIdAsync(_userManager.GetUserId(User));
            // var Date = await DB.Details.Select(a => a.DetailsCreatedate).FirstOrDefaultAsync();
             ViewBag.Data = DB.Details.Where(a=>a.DetailsUsersId == currentUser.Id).ToList();
-            
             return PartialView("Getreport");
         }
         
