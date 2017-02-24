@@ -157,7 +157,9 @@ namespace SystemLog.Controllers
 
                     await _signInManager.SignInAsync(user, isPersistent: false);
                     _logger.LogInformation(3, "User created a new account with password.");
-                    return RedirectToLocal(returnUrl);
+                    return RedirectToAction("Index", "Detail");
+                  //  return RedirectToLocal(returnUrl);
+                   
                 }
 
                 ViewBag.Company = new SelectList(DB.Companys.ToList(), "CompanyId", "CompanyName");
@@ -175,6 +177,7 @@ namespace SystemLog.Controllers
             string Html = "";
             var model = await DB.Departments.Where(b => b.DeptCompanyId == DeptCompanyId).ToListAsync();
             Html += "<select>";
+            Html += "<option>---เลือกแผนก---</option>";
             foreach (var department in model)
             {
                 Html += "<option value='"+ department.DepartmentsId  + "'>" + department.DepartmentsName + "</option>";

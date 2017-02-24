@@ -10,7 +10,7 @@
 @{
     ViewData["Title"] = "ค้นหารายการการติดตามสถานะการดำเนินการ";
     var Helper = ViewBag.Helper as SystemLog.Helper.Utility;
-    //  @ViewBag.MsgDate;
+    @ViewBag.MsgDate;
 }
 
 <h2 style="margin-top: 40px; text-align:center;">@ViewData["Title"]</h2>
@@ -34,25 +34,28 @@
                 </form>
             </div>
             <input type="hidden" name="UserId" id="UserId" value="@ViewBag.UserId">
-
-            <div style="text-align:right;">
-                <button type="button" class="btn btn-success" id="Excelreport">ส่งออก Excel</button>
-            </div>
+            @{ if (Model.Count() > 0)
+                {
+                    <div style="text-align:right;">
+                        <button type="button" class="btn btn-success" id="Excelreport">ส่งออก Excel</button>
+                    </div>
+                }
+            }
             <div style="margin-bottom:10px;"></div>
             <table class="table table-bordered">
                 <thead>
                     <tr>
-                        <th style="text-align:center;" rowspan="2">วันที่</th>
-                        <th style="text-align:center;" rowspan="2">หน่วยงาน/ลูกค้า และอื่นๆ</th>
+                        <th style="text-align:center;" rowspan="2" width="15%">วันที่</th>
+                        <th style="text-align:center;" rowspan="2" width="35%">หน่วยงาน/ลูกค้า และอื่นๆ</th>
                         <th style="text-align:center;" colspan="3">รายละเอียด</th>
-                        <th style="text-align:center;" colspan="2">หมายเหตุ</th>
+                        @*<th style="text-align:center;" colspan="2">หมายเหตุ</th>*@
                     </tr>
                     <tr>
-                        <th style="text-align:center;">งาน</th>
-                        <th style="text-align:center;">วันที่คาดว่าจะเสร็จ</th>
-                        <th style="text-align:center;">สถานะ</th>
-                        <th style="text-align:center;">ปัญหา/ไม่เรียบร้อย และอื่นๆ</th>
-                        <th style="text-align:center;">แนวทางแก้ไข/ปรับปรุง</th>
+                        <th style="text-align:center;" width="35%">งาน</th>
+                        @*<th style="text-align:center;">วันที่คาดว่าจะเสร็จ</th>*@
+                        <th style="text-align:center;" width="10%">สถานะ</th>
+                        @*<th style="text-align:center;">ปัญหา/ไม่เรียบร้อย และอื่นๆ</th>
+                        <th style="text-align:center;">แนวทางแก้ไข/ปรับปรุง</th>*@
                     </tr>
                 </thead>
                 <tbody>
@@ -62,25 +65,24 @@
                             foreach (var Searchreport in Model)
                             {
                                 <tr>
-                                    <th>@Helper.getDateTHAndTimeShortMonth(Searchreport.DetailsCreatedate)</th>
-                                    <th>@Searchreport.DetailsName</th>
-                                    <th>@Searchreport.DetailWork</th>
-                                    @{ }
-                                    <th>@Helper.getDateTHAndTimeShortMonth(Searchreport.DetailsDueDate)</th>
+                                    <th style="text-align:center;">@Helper.getDateTHAndTimeShortMonth(Searchreport.DetailsCreatedate)</th>
+                                    <th style="word-break: break-word;">@Searchreport.DetailsName</th>
+                                    <th  style="word-break: break-word;">@Searchreport.DetailWork</th>
+                                    @*<th  style="text-align:center;">@Helper.getDateTHAndTimeShortMonth(Searchreport.DetailsDueDate)</th>*@
                                     @{
                                         if (Searchreport.DetailsStatus == 100)
                                         {
-                                            <th>สำเร็จ</th>
+                                            <th style="text-align:center;">สำเร็จ</th>
 
                                         }
                                         else
                                         {
-                                            <th>@Searchreport.DetailsStatus</th>
+                                            <th style="text-align:center;">@Searchreport.DetailsStatus %</th>
 
                                         }
                                     }
-                                    <th>@Searchreport.DetailsNoteProblem</th>
-                                    <th>@Searchreport.DetailsNoteSolve</th>
+                                    @*<th  style="text-align:center;">@Searchreport.DetailsNoteProblem</th>
+                                    <th  style="text-align:center;">@Searchreport.DetailsNoteSolve</th>*@
                                 </tr>
                             }
 

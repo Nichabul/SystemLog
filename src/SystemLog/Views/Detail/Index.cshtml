@@ -17,7 +17,9 @@
                 <label class="control-label col-md-2" >เดือน : </label>
                 <select class="form-control col-md-4" id="Month">
                     @{
-                        for (int Month = 1; Month < 13; Month++)
+                        //var currentMonth = DateTime.Today.Month;
+                        var currentMonth = 12;
+                        for (int Month = 1; Month <= currentMonth; Month++)
                         {
                             if (Month == DateTime.Now.Month)
                             {
@@ -26,17 +28,14 @@
                             else
                             {
                                 <option value="@Month">@Helper.getMonth(Month)</option>
-
                             }
-
                         }
-
                     }
                 </select>
                 <label class="control-label col-md-2">ปี : </label>
                 <select class="form-control col-md-4" id="Year">
                     @{
-                        var currentYear = DateTime.Today.Year;
+                        var currentYear = DateTime.Now.Year;
                         for (int Year = 2017; Year <= currentYear; Year++)
                         {
                             <option value="@Year">@Year</option>
@@ -55,6 +54,7 @@
 
     <script>
         $(document).ready(function () {
+           
             $(function () {
                 var month = $("#Month").val();
                 var year = $("#Year").val();
@@ -62,7 +62,14 @@
                 $("#search").click(function () {
                     var month = $("#Month").val();
                     var year = $("#Year").val();
-                    Getreports(month, year);
+                    var NowDate = new Date();
+                    var NowMonth = NowDate.getMonth() + 1;
+                    var NowYear = NowDate.getFullYear();
+                    if (month <= NowMonth && year <= NowYear) {
+                         Getreports(month, year);
+                    }else{
+                        alert("กรุณาค้นหาใหม่อีกครั้ง เนื่องจากยังไม่ถึงเดือนและปีที่ต้องการค้นหา");
+                    }
                 });
             });
 
@@ -73,7 +80,7 @@
                     $(".manage").click(function () {
                         var date = $(this).val();
                         window.location.href = "/Detail/ManageDetails?date=" + date;
-
+                       // alert(date);
                     });
 
                     $(".review").click(function () {

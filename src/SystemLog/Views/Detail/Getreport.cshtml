@@ -3,48 +3,49 @@
     var Helper = ViewBag.Helper as SystemLog.Helper.Utility;
     var Data = ViewBag.Data as IEnumerable<SystemLog.Models.Details>;
 }
-<table class="table">
-    <thead>
-        <tr>
-            <th style="text-align:center;">ลำดับ</th>
-            <th style="text-align:center;">วันที่สร้างรายการ</th>
-            <th style="text-align:center;">สถานะ</th>
-            <th style="text-align:center;">จัดการ</th>
-        </tr>
-    </thead>
-    <tbody>
-        @{
-            //int Date = DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month);
-            int Date = DateTime.DaysInMonth(ViewBag.Year, ViewBag.Month);
-            for (int Day = 1; Day <= Date; Day++)
-            {
-                DateTime dt = new DateTime(ViewBag.Year, ViewBag.Month, Day);
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th style="text-align:center;">ลำดับ</th>
+                <th style="text-align:center;">วันที่สร้างรายการ</th>
+                <th style="text-align:center;">สถานะ</th>
+                <th style="text-align:center;">จัดการ</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                //int Date = DateTime.DaysInMonth(DateTime.Now.Year, DateTime.Now.Month);
+                int Date = DateTime.DaysInMonth(ViewBag.Year, ViewBag.Month);
+                for (int Day = 1; Day <= Date; Day++)
+                {
+                    DateTime dt = new DateTime(ViewBag.Year, ViewBag.Month, Day);
 
-                <tr>
-                    @{
-                        string Bgcolor = "";
-                        if (Convert.ToString(dt.DayOfWeek) == "Saturday" || Convert.ToString(dt.DayOfWeek) == "Sunday")
-                        {
-                            Bgcolor = "#D8D8D8";
-                        }
-                    }
-                    <td style="text-align:center;">@Day</td>
-                    <td style="text-align:center;">@Helper.getDateTHAndTimeShortMonth(dt)</td>
-                    <td style="text-align:center;">
+                    <tr>
                         @{
+                            string Bgcolor = "";
+                            // @Convert.ToString(dt.DayOfWeek);
+                            if (Convert.ToString(dt.DayOfWeek) == "Saturday" || Convert.ToString(dt.DayOfWeek) == "Sunday")
+                            {
+                                Bgcolor = "#D8D8D8";
+                            }
+                        }
+                        <td style="text-align:center; background-color:@Bgcolor;">@Day</td>
+                        <td style="text-align:center; background-color:@Bgcolor;">@Helper.getDateTHAndTimeShortMonth(dt)</td>
+                        <td style="text-align:center; background-color:@Bgcolor;">
+                            @{
                                 if (Data.Where(a => a.DetailsCreatedate == dt).Count() > 0)
                                 {
-                                    <p>สำเร็จ</p>
+                                    <p>บันทึก</p>
                                 }
                                 else
                                 {
-                                    <p>ยังไม่สำเร็จ</p>
+                                    <p>ยังไม่บันทึก</p>
                                 }
-                        }
-                    </td>
-                    <td style="text-align:center">
-                        @{
-                            
+                            }
+                        </td>
+                        <td style="text-align:center; background-color:@Bgcolor;">
+                            @{
+
                                 if (Data.Where(a => a.DetailsCreatedate == dt).Count() > 0)
                                 {
                                     <button type="button" class="btn btn-info review" value="@dt">ดูรายการ</button>
@@ -52,16 +53,23 @@
                                 }
                                 else
                                 {
-                                    <button type="button" class="btn btn-danger manage" value="@dt"> จัดการ </button>
+                                    if (new DateTime(ViewBag.Year, ViewBag.Month, Day) <= new DateTime(DateTime.Now.Year,DateTime.Now.Month, DateTime.Now.Day))
+                                    {
+                                        <button type="button" class="btn btn-danger manage" value="@dt"> จัดการ </button>
+                                    }
+                                    else
+                                    {
+                                        <button type="button" class="btn btn-danger manage" value="@dt" disabled>จัดการ  </button>
+                                    }
                                 }
-                        }
-                    </td>
-                </tr>
+                            }
+                        </td>
+                    </tr>
+                }
             }
-        }
 
-    </tbody>
-</table>
+        </tbody>
+    </table>
 
 
 

@@ -12,7 +12,9 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - SystemLog  </title>
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="~/images/Icon.ico">
+    <title>@ViewData["Title"] - DailyReport  </title>
 
     <environment names="Development">
         <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
@@ -28,6 +30,16 @@
     </environment>
     @Html.ApplicationInsightsJavaScript(TelemetryConfiguration)
 </head>
+<style>
+    .navbar-inverse{
+        background-color: #00CC99;
+        border-color: #00CC99;
+    }
+    .navbar-inverse .navbar-nav > li > a {
+        color: #000000;
+       padding-top: 25px;
+    }
+</style>
 <body>
     <div class="navbar navbar-inverse navbar-fixed-top">
         <div class="container">
@@ -38,7 +50,8 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">SystemLog</a>
+                <img src="~/images/Logo.png" alt="Smiley face" style="margin-top:5px;">
+                @*<a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand"></a>*@
             </div>
 
     <div class="navbar-collapse collapse">
@@ -78,7 +91,7 @@
         @RenderBody()
         <hr />
         <footer>
-            <p>&copy; 2017 - SystemLog</p>
+            <p style="text-align:center;">2017 © All Rights Reserved. Tanasan System Co.,Ltd.</p>
         </footer>
     </div>
 

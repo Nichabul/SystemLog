@@ -13,7 +13,8 @@
 <h2 style="margin-top: 40px; text-align:center;">@ViewData["Title"]</h2>
 <form asp-controller="Detail" asp-action="Reportdetail" id="addreport" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" class="form-horizontal">
     @*<div asp-validation-summary="All" class="text-danger"></div>*@
-    วันที่สร้างรายการ :  @Helper.getDateTHAndTimeShortMonth(ViewBag.date)
+    <p style="font-size: 12pt; font-weight: bold;"> วันที่สร้างรายการ :  @Helper.getDateTHAndTimeShortMonth(ViewBag.date)</p>
+    
 
     <div>
         <div style="text-align:right;">
@@ -23,12 +24,12 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th style="text-align:center;">หน่วยงาน/ลูกค้า และอื่นๆ</th>
-                    <th style="text-align:center;">งาน</th>
-                    <th style="text-align:center;">วันที่คาดว่าจะเสร็จ</th>
-                    <th style="text-align:center;">สถานะ</th>
-                    <th style="text-align:center;">ปัญหา</th>
-                    <th style="text-align:center;">แนวทางแก้ไข</th>
+                    <th style="width:20%">หน่วยงาน/ลูกค้า และอื่นๆ</th>
+                    <th style="width:30%">งาน</th>
+                    <th style="text-align:center; width:15%">วันที่คาดว่าจะเสร็จ</th>
+                    <th style="text-align:center; width:5%">สถานะ</th>
+                    <th style="width:15%">ปัญหา</th>
+                    <th style="width:15%">แนวทางแก้ไข</th>
                 </tr>
             </thead>
             <tbody>
@@ -37,10 +38,10 @@
                         foreach (var Getreport in Model)
                         {
                             <tr>
-                                <td>
+                                <td style="word-break: break-word;">
                                     @Getreport.DetailsName
                                 </td>
-                                <td>
+                                <td style="word-break: break-word;">
                                     @Getreport.DetailWork
                                 </td>
                                 <td style="text-align:center">
@@ -50,24 +51,23 @@
                                 @{
                                     if (Getreport.DetailsStatus == 100)
                                     {
-                                        <td style="text-align:center">
+                                        <td  style="text-align:center;">
                                            สำเร็จ
                                         </td>
-
                                     }
                                     else
                                     {
-                                        <td style="text-align:center">
-                                            @Getreport.DetailsStatus%
+                                        <td  style="text-align:center;">
+                                            @Getreport.DetailsStatus %
                                         </td>
 
                                     }
                                 }
                                
-                                <td>
+                                <td style="word-break: break-word;">
                                    @Getreport.DetailsNoteProblem
                                 </td>
-                                <td>
+                                <td style="word-break: break-word;">
                                    @Getreport.DetailsNoteSolve
                                 </td>
                             </tr>
@@ -87,9 +87,7 @@
                 var UserId = $("#UserId").val();
                 var Date = $("#Date").val();
                 window.location.href = "/Detail/Export?UserId=" + UserId + "&Date=" + Date;
-
             });
-
         });
     </script>
 }

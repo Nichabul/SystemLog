@@ -36,9 +36,9 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <th style="text-align:center">ชื่อ-สกุล</th>
-                        <th style="text-align:center">บริษัท</th>
-                        <th style="text-align:center">สิทธิ์การเข้าถึง</th>
+                        <th>ชื่อ-สกุล</th>
+                        <th>บริษัท</th>
+                        <th>สิทธิ์การเข้าถึง</th>
                         <th style="text-align:center">จัดการ</th>
                     </tr>
                 </thead>
@@ -51,8 +51,8 @@
                                 var role = await roleManager.FindByIdAsync(User.Roles.FirstOrDefault().RoleId);
                                 <tr>
                                     <td>@User.FirstName @User.LastName</td>
-                                    <td style="text-align:center">@User.Departments.Companys.CompanyName</td>
-                                    <td style="text-align:center">@role.Name</td>
+                                    <td>@User.Departments.Companys.CompanyName</td>
+                                    <td>@role.Name</td>
                                     <td style="text-align:center">
                                         <button type="button" class="btn btn-info EditUser" value="@User.Id">แก้ไข</button>
                                         <input type="hidden" class="Id" value="@User.Id">

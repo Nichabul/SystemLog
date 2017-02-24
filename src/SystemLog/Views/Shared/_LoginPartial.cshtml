@@ -4,15 +4,22 @@
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
 
+<style>
+    .navbar-inverse .btn-link {
+        color: #000000;
+         padding-top: 15px;
+    }
+</style>
+
 @if (SignInManager.IsSignedIn(User))
 {
     <form asp-area="" asp-controller="Account" asp-action="LogOff" method="post" id="logoutForm" class="navbar-right">
         <ul class="nav navbar-nav navbar-right">
             <li>
-                <a asp-area="" asp-controller="Manage" asp-action="Index" title="Manage">Welcome @UserManager.GetUserName(User)!</a>
+                <a asp-area="" asp-controller="Manage" asp-action="Index" title="Manage" class="glyphicon glyphicon-user"> @UserManager.GetUserName(User)</a>
             </li>
             <li>
-                <button type="submit"  class="btn btn-link navbar-btn navbar-link">Log off</button>
+                <button type="submit"  class="btn btn-link navbar-btn navbar-link glyphicon glyphicon-off"> ออกจากระบบ</button>
             </li>
         </ul>
     </form>

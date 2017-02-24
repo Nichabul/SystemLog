@@ -8,7 +8,7 @@
     var currentUser = await UserManager.FindByIdAsync(UserManager.GetUserId(User));
 }
 @{
-    ViewData["Title"] = "ค้นหารายการการติดตามสถานะการดำเนินการ";
+    ViewData["Title"] = "ค้นหารายงานการติดตามสถานะการดำเนินการ";
     var Helper = ViewBag.Helper as SystemLog.Helper.Utility;
 }
 
@@ -20,8 +20,12 @@
                 <div class="form-group">
                     <label class="col-md-2 control-label">บริษัท</label>
                     <div class="col-md-4">
-                        @Html.DropDownList("CompanyId", (IEnumerable<SelectListItem>)ViewBag.Company, new { @class = "form-control" })
+                        @Html.DropDownList("CompanyId", (IEnumerable<SelectListItem>)ViewBag.Company, "---กรุณาเลือกบริษัท---",new { @class = "form-control" })
                     </div>
+                    @*<label class="col-md-2 control-label">แผนก</label>
+                    <div class="col-md-4">
+                       <select id="DepartmentId" name="DepartmentId" class="form-control"></select>
+                    </div>*@
                     <label class="col-md-2 control-label">ชื่อพนักงาน</label>
                     <div class="col-md-4">
                         <select id="UserId" name="UserId" class="form-control"></select>
@@ -43,25 +47,28 @@
             </form>
         </div>
        
-
-        <div style="text-align:right;">
-            <button type="button" class="btn btn-success" id="Excelreport">ส่งออก Excel</button>
-        </div>
+        @{ if (Model.Count() > 0)
+            {
+                <div style="text-align:right;">
+                    <button type="button" class="btn btn-success" id="Excelreport">ส่งออก Excel</button>
+                </div>
+            }
+        }
         <div style="margin-bottom:10px;"></div>
         <table class="table table-bordered">
             <thead>
                 <tr>
-                    <th style="text-align:center;" rowspan="2">วันที่</th>
-                    <th style="text-align:center;" rowspan="2">หน่วยงาน/ลูกค้า และอื่นๆ</th>
-                    <th style="text-align:center;" colspan="3">รายละเอียด</th>
-                    <th style="text-align:center;" colspan="2">หมายเหตุ</th>
+                    <th style="text-align:center;" rowspan="2" width="15%">วันที่</th>
+                    <th style="text-align:center;" rowspan="2" width="35%">หน่วยงาน/ลูกค้า และอื่นๆ</th>
+                    <th style="text-align:center;" colspan="3" >รายละเอียด</th>
+                    @*<th style="text-align:center;" colspan="2">หมายเหตุ</th>*@
                 </tr>
                 <tr>
-                    <th style="text-align:center;">งาน</th>
-                    <th style="text-align:center;">วันที่คาดว่าจะเสร็จ</th>
-                    <th style="text-align:center;">สถานะ</th>
-                    <th style="text-align:center;">ปัญหา/ไม่เรียบร้อย และอื่นๆ</th>
-                    <th style="text-align:center;">แนวทางแก้ไข/ปรับปรุง</th>
+                    <th style="text-align:center;"width="35%">งาน</th>
+                    @*<th style="text-align:center;">วันที่คาดว่าจะเสร็จ</th>*@
+                    <th style="text-align:center;"width="10%">สถานะ</th>
+                    @*<th style="text-align:center;">ปัญหา/ไม่เรียบร้อย และอื่นๆ</th>
+                    <th style="text-align:center;">แนวทางแก้ไข/ปรับปรุง</th>*@
                 </tr>
             </thead>
             <tbody>
@@ -70,28 +77,25 @@
                     {
                         foreach (var Searchreport in Model)
                         {
-                            @*<tr>
-                                <th colspan="7">@Searchreport.Users.FirstName @Searchreport.Users.LastName</th>
-                            </tr>*@
                             <tr>
-                                <th>@Helper.getDateTHAndTimeShortMonth(Searchreport.DetailsCreatedate)</th>
-                                <th>@Searchreport.DetailsName</th>
-                                <th>@Searchreport.DetailWork</th>
-                                <th>@Helper.getDateTHAndTimeShortMonth(Searchreport.DetailsDueDate)</th>
+                                <th style="text-align:center;">@Helper.getDateTHAndTimeShortMonth(Searchreport.DetailsCreatedate)</th>
+                                <th style="word-break: break-word;">@Searchreport.DetailsName</th>
+                                <th style="word-break: break-word;">@Searchreport.DetailWork</th>
+                                @*<th>@Helper.getDateTHAndTimeShortMonth(Searchreport.DetailsDueDate)</th>*@
                                 @{
                                     if (Searchreport.DetailsStatus == 100)
                                     {
-                                        <th>สำเร็จ</th>
+                                        <th style="text-align:center;">สำเร็จ</th>
 
                                     }
                                     else
                                     {
-                                        <th>@Searchreport.DetailsStatus %</th>
+                                        <th style="text-align:center;">@Searchreport.DetailsStatus %</th>
 
                                     }
                                 }
-                                <th>@Searchreport.DetailsNoteProblem</th>
-                                <th>@Searchreport.DetailsNoteSolve</th>
+                                @*<th>@Searchreport.DetailsNoteProblem</th>
+                                <th>@Searchreport.DetailsNoteSolve</th>*@
                             </tr>
                                         }
 

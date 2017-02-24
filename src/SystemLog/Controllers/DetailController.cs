@@ -55,6 +55,7 @@ namespace SystemLog.Controllers
             Helper = new SystemLog.Helper.Utility(signInManager, DB);
             DB = ContextDb;
         }
+        [Authorize]
         public IActionResult Index()
         {
             ViewBag.Helper = Helper;
@@ -79,19 +80,19 @@ namespace SystemLog.Controllers
             ViewBag.UserId = currentUser.Id;
             ViewBag.Helper = Helper;
             ViewBag.date = date;
-            ViewBag.GetReport = DB.Details.Where(a => a.DetailsCreatedate == date).ToList();
+            ViewBag.GetReport = DB.Details.Where(a => a.DetailsCreatedate == date && a.DetailsUsersId == currentUser.Id).ToList();
             return View("ManageDetails");
         }
 
         [HttpPost]
-        public async Task<IActionResult> ManageDetails(DateTime CreateDate, DateTime[] DetailsCreatedate, string[] DetailsName, String[] DetailWork , DateTime[] DetailsDueDate, int[] DetailsStatus, string[] DetailsNoteProblem, string[] DetailsNoteSolve, string[] UserId)
+        public async Task<IActionResult> ManageDetails(DateTime CreateDate, DateTime[] DetailsCreatedate, string[] DetailsName, String[] DetailWork , DateTime[] DetailsDueDate, int[] DetailsStatus, string[] DetailsNoteProblem, string[] DetailsNoteSolve, string UserId)
         {
             string msg = "";
             try
             {
-                if(DB.Details.Where(a=>a.DetailsCreatedate == CreateDate).Count() > 0)
+                if(DB.Details.Where(a=>a.DetailsCreatedate == CreateDate && a.DetailsUsersId == UserId).Count() > 0 )
                 {
-                    var detailremove = DB.Details.Where(b => b.DetailsCreatedate == CreateDate).ToList();
+                    var detailremove = DB.Details.Where(b => b.DetailsCreatedate == CreateDate && b.DetailsUsersId == UserId).ToList();
                     DB.Details.RemoveRange(detailremove);
                     DB.SaveChanges();
                    
@@ -101,7 +102,7 @@ namespace SystemLog.Controllers
                         var model = new Details();
                         model.DetailsCreatedate = DetailsCreatedate[i];
                         model.DetailWork = DetailWork[i];
-                        model.DetailsUsersId = UserId[i];
+                        model.DetailsUsersId = UserId;
                         model.DetailsName = DetailsName[i];
                         model.DetailsDueDate = DetailsDueDate[i];
                         model.DetailsStatus = DetailsStatus[i];
@@ -122,7 +123,7 @@ namespace SystemLog.Controllers
                         model.DetailsCreatedate = DetailsCreatedate[i];
                         model.DetailWork = DetailWork[i];
                         model.DetailsName = DetailsName[i];
-                        model.DetailsUsersId = UserId[i];
+                        model.DetailsUsersId = UserId;
                         model.DetailsDueDate = DetailsDueDate[i];
                         model.DetailsStatus = DetailsStatus[i];
                         model.DetailsNoteProblem = DetailsNoteProblem[i];
@@ -140,6 +141,26 @@ namespace SystemLog.Controllers
             }
             return RedirectToAction("index");
         }
+
+        //[HttpGet]
+        //public async Task<IActionResult> DeleteDetail(int Id , string UserId)
+        //{
+        //    string msg = "";
+        //    try
+        //    {
+        //        var Model = await DB.Details.Where(d=>d.DetailsUsersId == UserId && d.DetailsID == Id).FirstOrDefaultAsync();
+        //        DB.Details.RemoveRange(Model);
+        //        await DB.SaveChangesAsync();
+        //        msg = "Removed";
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        msg = "Error is :" + e.Message;
+        //    }
+
+        //    return RedirectToAction("ManageDetails");
+        //    //return RedirectToAction("ManageDetails", "Detail");
+        //}
         
 
         public async Task<IActionResult> Reportdetail(DateTime date)
@@ -160,11 +181,19 @@ namespace SystemLog.Controllers
             var currentUser = await _userManager.FindByIdAsync(_userManager.GetUserId(User));
             string FullName = currentUser.FirstName + " " + currentUser.LastName;
 
+            var CompanyId = DB.Users.Include(b => b.Departments).Where(a => a.Id == currentUser.Id).FirstOrDefault();
             var GetReports = DB.Details.Where(a => a.DetailsUsersId == UserId && a.DetailsCreatedate == Date).ToList();
-            
-           
 
-            var templateFilePath = Path.Combine(_environment.WebRootPath.ToString(), "ReportTemplate/TemplateLogsystem.xlsx");
+            var templateFilePath = "";
+            if (CompanyId.Departments.DeptCompanyId == 1)
+            {
+                templateFilePath = Path.Combine(_environment.WebRootPath.ToString(), "ReportTemplate/TemplateLogsystem_TS.xlsx");
+            }
+            else
+            {
+                templateFilePath = Path.Combine(_environment.WebRootPath.ToString(), "ReportTemplate/TemplateLogsystem_TT.xlsx");
+            }
+            //var templateFilePath = Path.Combine(_environment.WebRootPath.ToString(), "ReportTemplate/TemplateLogsystem.xlsx");
             FileInfo templateFile = new FileInfo(templateFilePath);
 
             var newFilePath = Path.Combine(_environment.WebRootPath.ToString(), "ReportTemplate/TempLogsystem.xlsx");
@@ -175,7 +204,7 @@ namespace SystemLog.Controllers
                 ExcelWorksheet worksheet = package.Workbook.Worksheets[1];
 
                 worksheet.Cells["B2"].Value = FullName;
-                worksheet.Cells["B3"].Value = Helper.getDateTHAndTimeShortMonth(Date); 
+                worksheet.Cells["B3"].Value = Helper.getDateTHAndTimeShortMonth(Date);
                 int Rows = 7;
                 if (GetReports.Count() > 0)
                 {
@@ -185,10 +214,11 @@ namespace SystemLog.Controllers
                         worksheet.Cells["B" + Rows].Value = GetReport.DetailsName;
                         worksheet.Cells["C" + Rows].Value = GetReport.DetailWork;
                         worksheet.Cells["D" + Rows].Value = Helper.getDateTHAndTimeShortMonth(GetReport.DetailsDueDate);
-                        if(GetReport.DetailsStatus == 100)
+                        if (GetReport.DetailsStatus == 100)
                         {
                             worksheet.Cells["E" + Rows].Value = "สำเร็จ";
-                        }else
+                        }
+                        else
                         {
                             worksheet.Cells["E" + Rows].Value = GetReport.DetailsStatus + "%";
                         }
@@ -200,7 +230,7 @@ namespace SystemLog.Controllers
                 else
                 {
                     worksheet.Cells["A7:G7"].Merge = true;
-                    worksheet.Cells["A7"].Value = "--- ไม่มีข้อมูลการติดตามสถานะการดำเนินงาน ---" ;
+                    worksheet.Cells["A7"].Value = "--- ไม่มีข้อมูลการติดตามสถานะการดำเนินงาน ---";
                 }
                 package.Save();
             }
@@ -234,7 +264,6 @@ namespace SystemLog.Controllers
             ViewBag.EndDate = EndDates;
             ViewBag.UserId = currentUser.Id;
 
-
             var Searchreport = await DB.Details.Where(a => a.DetailsCreatedate >= StartDate && a.DetailsCreatedate <= EndDate
                                                     && a.DetailsUsersId == currentUser.Id).OrderBy(b=>b.DetailsCreatedate).ToListAsync();
 
@@ -266,16 +295,26 @@ namespace SystemLog.Controllers
         {
             var currentUser = await _userManager.FindByIdAsync(_userManager.GetUserId(User));
             UserId = currentUser.Id;
+            var CompanyId = DB.Users.Include(b=>b.Departments).Where(a=>a.Id == currentUser.Id).FirstOrDefault();
+
             DateTime StartingDate = DateTime.ParseExact(StartDate, "dd/MM/yyyy", null);
             DateTime EndingDate = DateTime.ParseExact(EndDate, "dd/MM/yyyy", null);
-
+          
             string FullName = currentUser.FirstName + " " + currentUser.LastName;
 
             var GetReports = DB.Details.Where(a => a.DetailsUsersId == UserId && a.DetailsCreatedate >= StartingDate && a.DetailsCreatedate <= EndingDate).OrderBy(b => b.DetailsCreatedate).ToList();
 
-
-
-            var templateFilePath = Path.Combine(_environment.WebRootPath.ToString(), "ReportTemplate/TemplateLogsystem.xlsx");
+            var templateFilePath = "";
+            if (CompanyId.Departments.DeptCompanyId == 1)
+            {
+                templateFilePath = Path.Combine(_environment.WebRootPath.ToString(), "ReportTemplate/TemplateLogsystem_TS.xlsx");
+            }
+            else
+            {
+                templateFilePath = Path.Combine(_environment.WebRootPath.ToString(), "ReportTemplate/TemplateLogsystem_TT.xlsx");
+            }
+    
+           
             FileInfo templateFile = new FileInfo(templateFilePath);
 
             var newFilePath = Path.Combine(_environment.WebRootPath.ToString(), "ReportTemplate/TempLogsystem.xlsx");
@@ -285,6 +324,7 @@ namespace SystemLog.Controllers
             {
                 ExcelWorksheet worksheet = package.Workbook.Worksheets[1];
 
+              
                 worksheet.Cells["B2"].Value = FullName;
                 worksheet.Cells["B3"].Value = Helper.getDateTHAndTimeShortMonth(StartingDate) + " " +"ถึง" + " " + Helper.getDateTHAndTimeShortMonth(EndingDate);
                 int Rows = 7;
@@ -395,14 +435,25 @@ namespace SystemLog.Controllers
             ViewBag.UserId = UserId;
             DateTime StartingDate = DateTime.ParseExact(StartDate, "dd/MM/yyyy", null);
             DateTime EndingDate = DateTime.ParseExact(EndDate, "dd/MM/yyyy", null);
+         
             var User = await DB.Users.Where(a => a.Id == UserId).FirstOrDefaultAsync();
+            var CompanyId = DB.Users.Include(b => b.Departments).Where(a => a.Id == User.Id).FirstOrDefault();
             var FullName = User.FirstName + " " + User.LastName;
 
             var GetReports = await DB.Details.Where(a => a.DetailsCreatedate >= StartingDate && a.DetailsCreatedate <= EndingDate && a.DetailsUsersId == UserId).OrderBy(b => b.DetailsCreatedate).ToListAsync();
 
-            var templateFilePath = Path.Combine(_environment.WebRootPath.ToString(), "ReportTemplate/TemplateLogsystem.xlsx");
-            FileInfo templateFile = new FileInfo(templateFilePath);
+            var templateFilePath = "";
+            if (CompanyId.Departments.DeptCompanyId == 1)
+            {
+                templateFilePath = Path.Combine(_environment.WebRootPath.ToString(), "ReportTemplate/TemplateLogsystem_TS.xlsx");
+            }
+            else
+            {
+                templateFilePath = Path.Combine(_environment.WebRootPath.ToString(), "ReportTemplate/TemplateLogsystem_TT.xlsx");
+            }
 
+           // var templateFilePath = Path.Combine(_environment.WebRootPath.ToString(), "ReportTemplate/TemplateLogsystem.xlsx");
+            FileInfo templateFile = new FileInfo(templateFilePath);
             var newFilePath = Path.Combine(_environment.WebRootPath.ToString(), "ReportTemplate/TempLogsystem.xlsx");
             FileInfo newFile = new FileInfo(newFilePath);
 
